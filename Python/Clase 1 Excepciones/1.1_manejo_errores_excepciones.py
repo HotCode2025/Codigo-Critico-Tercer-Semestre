@@ -1,10 +1,14 @@
 resultado = None
-a = '10'
-b = 0
+a = 7
+b = 5
 try:
     resultado = a / b # modificamos
-except Exception as e:  ##utilizar la clase padre siempre porque con Zerodivisionerror da error lo mas generico.
-    print(f'Ocurrio un error: {e}') ## La nombramos con la variale e
+except TypeError as e:
+    print(f'TypeError - Ocurrio un error: {type(e)}')
+except ZeroDivisionError as e:
+    print(f'ZeroDivisionError - Ocurrio un error: {type(e)}') ##variable e se puede cambiar
+except Exception as e:  ##Debe ir al final siempre esta clase ##utilizar la clase padre siempre porque con Zerodivisionerror da error lo mas generico.
+    print(f' Exception - Ocurrio un error: {type(e)}') ## La nombramos con la variale e
 
 print(f'Resultado: {resultado}')
 print('seguimos...')
