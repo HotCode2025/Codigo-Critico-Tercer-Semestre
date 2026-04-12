@@ -11,5 +11,11 @@ except ZeroDivisionError as e:
 except Exception as e:  ##Debe ir al final siempre esta clase ##utilizar la clase padre siempre porque con Zerodivisionerror da error lo mas generico.
     print(f' Exception - Ocurrio un error: {type(e)}') ## La nombramos con la variale e
 
+else:
+    print('No se arrojo ninguna excepcion')
+
+finally: ##SIEMPRE SE VA A EJECUTAR MUY IMPORTANTE
+    print('Ejecucion de este bloque finally')
+
 print(f'Resultado: {resultado}')
 print('seguimos...')
