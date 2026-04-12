@@ -1,7 +1,8 @@
 resultado = None
-a = 7
-b = 5
+
 try:
+    a = int(input('Digite el primer numero: '))
+    b = int(input('Digite el segundo numero: '))
     resultado = a / b # modificamos
 except TypeError as e:
     print(f'TypeError - Ocurrio un error: {type(e)}')
