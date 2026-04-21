@@ -100,5 +100,12 @@ Cuando termines una tarea y quieras que tu código forme parte del proyecto prin
 | `rm -rf nombre_carpeta`| ⚠️ **¡CUIDADO!** Elimina una carpeta y todo su contenido de forma permanente. |
 
 ---
+# 📚 Documentación Oficial (Wiki)
 
+Toda la planificación, reglas de trabajo y organización del equipo "Código Crítico" se encuentra en nuestra Wiki. Podés acceder a los accesos directos acá:
+
+* [📅 Planificación de Clases y Rotación](https://github.com/HotCode2025/Codigo-Critico-Tercer-Semestre/wiki/Planificaci%C3%B3n-de-Clases-y-Rotaci%C3%B3n-de-Lenguajes)
+* [⚙️ Metodología y Scrum](https://github.com/HotCode2025/Codigo-Critico-Tercer-Semestre/wiki/Metodologia-y-Scrum)
+* [💻 Reglas de Contribución](https://github.com/HotCode2025/Codigo-Critico-Tercer-Semestre/wiki/Reglas-de-Contribuci%C3%B3n)
+  
 ¡A programar y a romperla, equipo! 💪
