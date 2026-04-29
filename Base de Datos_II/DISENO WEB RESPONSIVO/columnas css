@@ -23,20 +23,130 @@
     display: table;
 }
 
+/* COLUMNAS */
 [class*="col-"]{
-   float: left;
-   border: 1px solid black;
-   padding: 20px;
+    float: left;
+    padding: 10px;
 }
 
-.col-12{
-    width: 100%;
+body{
+    background: #eaeaea;
 }
 
-.col-6{
-    width: 50%;
+.contenedor{
+    max-width: 1000px;
+    margin: auto;
+    background: white;
 }
 
-.col-4{
-    width: 33.333333333%;
+/* LOGO */
+header #logo{
+    font-family: "Kaushan Script", cursive;
+    font-size: 50px;
+    text-align: center;
+    line-height: 60px;
+}
+
+/* ICONOS */
+header center{
+    width: 42px;
+    line-height: 42px;
+    border-radius: 100%;
+    background: #ccc;
+    color: white;
+    display: block;
+    margin: auto;
+}
+
+/* COLORES DE ICONOS */
+header center#icono1{
+    background: blue;
+}
+
+header center#icono2{
+    background: green;
+}
+
+header center#icono3{
+    background: red;
+}
+
+/* ========================= */
+/* PANTALLAS GRANDES (>=1200px) */
+/* ========================= */
+@media(min-width:1200px){
+
+.col-lg-12{width:100%;}
+.col-lg-11{width:91.66666667%;}
+.col-lg-10{width:83.33333333%;}
+.col-lg-9{width:75%;}
+.col-lg-8{width:66.66666667%;}
+.col-lg-7{width:58.33333333%;}
+.col-lg-6{width:50%;}
+.col-lg-5{width:41.66666667%;}
+.col-lg-4{width:33.33333333%;}
+.col-lg-3{width:25%;}
+.col-lg-2{width:16.66666667%;}
+.col-lg-1{width:8.33333333%;}
+
+}
+
+/* ========================= */
+/* PANTALLAS MEDIANAS (992px - 1199px) */
+/* ========================= */
+@media(max-width:1199px) and (min-width:992px){
+
+.col-md-12{width:100%;}
+.col-md-11{width:91.66666667%;}
+.col-md-10{width:83.33333333%;}
+.col-md-9{width:75%;}
+.col-md-8{width:66.66666667%;}
+.col-md-7{width:58.33333333%;}
+.col-md-6{width:50%;}
+.col-md-5{width:41.66666667%;}
+.col-md-4{width:33.33333333%;}
+.col-md-3{width:25%;}
+.col-md-2{width:16.66666667%;}
+.col-md-1{width:8.33333333%;}
+
+}
+
+/* ========================= */
+/* TABLET (768px - 991px) */
+/* ========================= */
+@media(max-width:991px) and (min-width:768px){
+
+.col-sm-12{width:100%;}
+.col-sm-11{width:91.66666667%;}
+.col-sm-10{width:83.33333333%;}
+.col-sm-9{width:75%;}
+.col-sm-8{width:66.66666667%;}
+.col-sm-7{width:58.33333333%;}
+.col-sm-6{width:50%;}
+.col-sm-5{width:41.66666667%;}
+.col-sm-4{width:33.33333333%;}
+.col-sm-3{width:25%;}
+.col-sm-2{width:16.66666667%;}
+.col-sm-1{width:8.33333333%;}
+
+}
+
+/* ========================= */
+/* CELULARES (<768px) */
+/* ========================= */
+@media(max-width:767px){
+
+.col-xs-12{width:100%;}
+.col-xs-11{width:91.66666667%;}
+.col-xs-10{width:83.33333333%;}
+.col-xs-9{width:75%;}
+.col-xs-8{width:66.66666667%;}
+.col-xs-7{width:58.33333333%;}
+.col-xs-6{width:50%;}
+.col-xs-5{width:41.66666667%;}
+.col-xs-4{width:33.33333333%;}
+.col-xs-3{width:25%;}
+.col-xs-2{width:16.66666667%;}
+.col-xs-1{width:8.33333333%;}
+
 }
