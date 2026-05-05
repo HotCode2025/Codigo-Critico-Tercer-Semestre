@@ -7,11 +7,17 @@
     box-sizing: border-box;
 }
 
+body{
+    background: #eaeaea;
+}
+
 .contenedor{
     position: relative;
     margin: auto;
     width: 100%;
     height: auto;
+    max-width: 1000px;
+    background: white;
 }
 
 .fila{
@@ -29,16 +35,6 @@
     padding: 10px;
 }
 
-body{
-    background: #eaeaea;
-}
-
-.contenedor{
-    max-width: 1000px;
-    margin: auto;
-    background: white;
-}
-
 /* LOGO */
 header #logo{
     font-family: "Kaushan Script", cursive;
@@ -48,105 +44,137 @@ header #logo{
 }
 
 /* ICONOS */
-header center{
-    width: 42px;
-    line-height: 42px;
-    border-radius: 100%;
-    background: #ccc;
-    color: white;
+header center p{
+    text-align: center;
+    width:42px;
+    line-height:42px;
+    border-radius:100%;
+    background:#ccc;
+    color:white;
+    margin:auto;
+}
+
+/* COLORES */
+header center#icono1 p{ background: blue; }
+header center#icono2 p{ background: green; }
+header center#icono3 p{ background: red; }
+
+/* NAV */
+nav ul li{
+    padding: 10px;
+    text-align: center;
+}
+
+nav ul li a{
     display: block;
-    margin: auto;
+    background: rgb(104, 22, 104);
+    font-family: "Kaushan Script", cursive;
+    color: white;
+    line-height: 48px;
 }
 
-/* COLORES DE ICONOS */
-header center#icono1{
-    background: blue;
+nav ul li a:hover{
+    background: rosybrown;
 }
 
-header center#icono2{
-    background: green;
+nav ul li a:active{
+    background: rgb(224, 22, 224);
 }
 
-header center#icono3{
-    background: red;
+/* SECCION 3 */
+#seccion3 center{
+    padding:20px;
+}
+
+#seccion3 img{
+    border-radius:100%;
+    width: 200px;
+    height: 200px;
+    padding: 10px;
+}
+
+#seccion3 h1{
+    font-family: "Kaushan Script", cursive;
+    font-size: 40px;
+    padding: 10px;
+}
+
+#seccion3 p{
+    padding:10px;
 }
 
 /* ========================= */
-/* PANTALLAS GRANDES (>=1200px) */
+/* LG */
 /* ========================= */
 @media(min-width:1200px){
-
 .col-lg-12{width:100%;}
 .col-lg-11{width:91.66666667%;}
 .col-lg-10{width:83.33333333%;}
 .col-lg-9{width:75%;}
-.col-lg-8{width:66.66666667%;}
+.col-lg-8{width:66.666666666%;}
 .col-lg-7{width:58.33333333%;}
 .col-lg-6{width:50%;}
-.col-lg-5{width:41.66666667%;}
+.col-lg-5{width:41.66666666%;}
 .col-lg-4{width:33.33333333%;}
 .col-lg-3{width:25%;}
 .col-lg-2{width:16.66666667%;}
-.col-lg-1{width:8.33333333%;}
-
+.col-lg-1{width:8.333333333%;}
+.col-lg-0{display:none;}
 }
 
 /* ========================= */
-/* PANTALLAS MEDIANAS (992px - 1199px) */
+/* MD */
 /* ========================= */
 @media(max-width:1199px) and (min-width:992px){
-
 .col-md-12{width:100%;}
 .col-md-11{width:91.66666667%;}
 .col-md-10{width:83.33333333%;}
 .col-md-9{width:75%;}
-.col-md-8{width:66.66666667%;}
+.col-md-8{width:66.666666666%;}
 .col-md-7{width:58.33333333%;}
 .col-md-6{width:50%;}
-.col-md-5{width:41.66666667%;}
+.col-md-5{width:41.66666666%;}
 .col-md-4{width:33.33333333%;}
 .col-md-3{width:25%;}
 .col-md-2{width:16.66666667%;}
-.col-md-1{width:8.33333333%;}
-
+.col-md-1{width:8.333333333%;}
+.col-md-0{display:none;}
 }
 
 /* ========================= */
-/* TABLET (768px - 991px) */
+/* SM */
 /* ========================= */
 @media(max-width:991px) and (min-width:768px){
-
 .col-sm-12{width:100%;}
 .col-sm-11{width:91.66666667%;}
 .col-sm-10{width:83.33333333%;}
 .col-sm-9{width:75%;}
-.col-sm-8{width:66.66666667%;}
+.col-sm-8{width:66.666666666%;}
 .col-sm-7{width:58.33333333%;}
 .col-sm-6{width:50%;}
-.col-sm-5{width:41.66666667%;}
+.col-sm-5{width:41.66666666%;}
 .col-sm-4{width:33.33333333%;}
 .col-sm-3{width:25%;}
 .col-sm-2{width:16.66666667%;}
-.col-sm-1{width:8.33333333%;}
-
+.col-sm-1{width:8.333333333%;}
+.col-sm-0{display:none;}
 }
 
 /* ========================= */
-/* CELULARES (<768px) */
+/* XS */
 /* ========================= */
 @media(max-width:767px){
-
 .col-xs-12{width:100%;}
 .col-xs-11{width:91.66666667%;}
 .col-xs-10{width:83.33333333%;}
 .col-xs-9{width:75%;}
-.col-xs-8{width:66.66666667%;}
+.col-xs-8{width:66.666666666%;}
 .col-xs-7{width:58.33333333%;}
 .col-xs-6{width:50%;}
-.col-xs-5{width:41.66666667%;}
+.col-xs-5{width:41.66666666%;}
 .col-xs-4{width:33.33333333%;}
 .col-xs-3{width:25%;}
 .col-xs-2{width:16.66666667%;}
-.col-xs-1{width:8.33333333%;}
-
+.col-xs-1{width:8.333333333%;}
+.col-xs-0{display:none;}
 }
