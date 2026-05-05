@@ -16,3 +16,5 @@ print(registros)
 
 cursor.close()
 conexion.close()
+
+#https://www.psycopg.org/docs/usage.html
