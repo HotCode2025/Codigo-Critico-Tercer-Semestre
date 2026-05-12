@@ -178,3 +178,78 @@ nav ul li a:active{
 .col-xs-1{width:8.333333333%;}
 .col-xs-0{display:none;}
 }
+/* SECCION 4 */
+
+/* LISTA IZQUIERDA */
+#seccion4 aside ul li{
+    background: violet;
+    padding: 10px;
+    margin: 2px 10px;
+    list-style: square;
+    list-style-position: inside;
+}
+
+/* TITULO ARTICULO */
+#seccion4 article h1{
+    font-family: "Kaushan Script", cursive;
+    font-size: 40px;
+    margin: 20px;
+}
+
+/* IMAGEN DENTRO DEL TEXTO */
+#seccion4 article p img{
+    float: left;
+    margin-right: 20px;
+}
+
+/* PARRAFO */
+#seccion4 article p{
+    margin: 5px 20px;
+    font-size: 14px;
+    text-align: justify;
+}
+
+/* FORMULARIO DERECHA */
+#seccion4 aside#der h1{
+    line-height: 50px;
+    text-align: center;
+    background: olive;
+    color: white;
+    margin-bottom: 5px;
+}
+
+#seccion4 aside#der input{
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+/* RESPONSIVE IMAGEN */
+
+/* LG */
+@media(min-width:1200px){
+    #seccion4 article p img{
+        width: 50%;
+    }
+}
+
+/* MD */
+@media(max-width:1199px) and (min-width:992px){
+    #seccion4 article p img{
+        width: 60%;
+    }
+}
+
+/* SM */
+@media(max-width:991px) and (min-width:768px){
+    #seccion4 article p img{
+        width: 100%;
+    }
+}
+
+/* XS */
+@media(max-width:767px){
+    #seccion4 article p img{
+        width: 100%;
+    }
+}
