@@ -1,0 +1,196 @@
+:root {
+    --p1-color: #39ff14;
+    --p2-color: #ff3131;
+    --accent-cyan: #00f0ff;
+    --panel-bg: rgba(6, 12, 32, 0.9);
+}
+
+body {
+    margin: 0;
+    background: #000;
+    background-image: radial-gradient(circle at 20% 30%, #1e1b4b 0%, transparent 40%),
+                      radial-gradient(circle at 80% 70%, #312e81 0%, transparent 40%);
+    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.game-screen {
+    width: 100%;
+    max-width: 1100px;
+    min-height: 80vh; 
+    position: relative;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: url('https://www.transparenttextures.com/patterns/stardust.png');
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.3);
+}
+
+.hud-top {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+    z-index: 20;
+    gap: 10px;
+}
+
+.player-bar {
+    width: 35%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.p2 { flex-direction: row-reverse; text-align: right; }
+
+.avatar {
+    width: clamp(35px, 8vw, 45px);
+    height: clamp(35px, 8vw, 45px);
+    background: #111;
+    border: 2px solid var(--accent-cyan);
+    border-radius: 4px;
+    font-size: clamp(18px, 5vw, 25px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.hp-container { flex-grow: 1; min-width: 0; }
+.hp-label { font-size: 11px; font-weight: bold; margin-bottom: 4px; display: flex; justify-content: space-between; }
+.hp-bar-bg { height: 8px; background: #222; border: 1px solid rgba(255,255,255,0.2); }
+.hp-fill { height: 100%; width: 100%; transition: width 0.5s ease; }
+.p1-hp { background: var(--p1-color); box-shadow: 0 0 10px var(--p1-color); }
+.p2-hp { background: var(--p2-color); box-shadow: 0 0 10px var(--p2-color); }
+
+.match-info { text-align: center; font-family: 'Orbitron', sans-serif; }
+.match-info h1 { font-size: 12px; margin: 0; color: var(--accent-cyan); letter-spacing: 1px; }
+.match-score { font-size: 18px; font-weight: 900; background: rgba(255,255,255,0.1); padding: 4px 12px; border-radius: 4px; margin-top: 5px; }
+
+.battle-stage {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 40px 5%;
+}
+
+.ship { font-size: clamp(50px, 12vw, 100px); filter: drop-shadow(0 0 20px rgba(255,255,255,0.2)); transition: all 0.3s ease; }
+.ship-p1 { transform: scaleX(-1); }
+
+.center-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    text-align: center;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#fx-text { font-size: clamp(16px, 5vw, 32px); font-family: 'Orbitron'; font-weight: 900; text-shadow: 0 0 15px currentColor; }
+#fx-icon { font-size: clamp(24px, 6vw, 50px); margin-top: 10px; }
+
+.btn-reset {
+    background: var(--accent-cyan);
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    pointer-events: auto;
+    margin-top: 15px;
+    display: none;
+    box-shadow: 0 0 20px var(--accent-cyan);
+}
+
+.hud-bottom {
+    padding: 15px;
+    background: var(--panel-bg);
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    gap: 15px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.status-panel .label { font-size: 9px; color: var(--accent-cyan); }
+.status-val { font-size: 16px; font-weight: 900; }
+
+.attack-selector { display: flex; gap: 8px; justify-content: center; }
+
+.btn-attack {
+    background: #000;
+    border: 1px solid #444;
+    flex: 1;
+    max-width: 80px;
+    height: clamp(70px, 15vw, 90px);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.btn-attack span { font-size: 24px; }
+.btn-attack label { color: white; font-size: 9px; cursor: pointer; pointer-events: none; margin-top: 5px;}
+.btn-attack:hover:not(:disabled) { border-color: var(--accent-cyan); background: #111; }
+
+.combat-log {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--accent-cyan);
+    padding: 8px;
+    font-size: 10px;
+    height: 60px;
+    overflow-y: auto;
+    font-family: monospace;
+    box-sizing: border-box;
+}
+
+.audio-ctrl {
+    position: absolute;
+    top: -35px;
+    right: 0;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--accent-cyan);
+    color: var(--accent-cyan);
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 10px;
+    font-family: 'Orbitron';
+}
+
+@media (max-width: 768px) {
+    .game-screen { min-height: 90vh; }
+    .hud-bottom {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 10px;
+        padding: 10px;
+    }
+    .status-panel { order: 3; display: flex; justify-content: space-between; align-items: center; }
+    .attack-selector { order: 1; width: 100%; }
+    .log-panel { order: 2; }
+    .ship { font-size: 60px; }
+    .battle-stage { padding: 20px 2%; }
+}
+
+@media (max-width: 480px) {
+    .player-bar { width: 42%; }
+    .match-info h1 { display: none; }
+    .ship { font-size: 50px; }
+}

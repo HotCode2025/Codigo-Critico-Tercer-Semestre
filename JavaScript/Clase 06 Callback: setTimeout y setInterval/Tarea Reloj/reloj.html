@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Telemetry Clock</title>
+    <link rel="stylesheet" href="reloj-estilos.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="reloj-f1">
+        <div class="carbon-fiber"></div>
+        <div class="red-line"></div>
+        
+        <div class="display-f1">
+            <div class="f1-logo">F1</div>
+            <div id="fecha-digital">00 ENE</div>
+            <div id="am-pm">--</div>
+        </div>
+
+        <div class="numeros">
+            <span style="--i:1;"><b>1</b></span>
+            <span style="--i:2;"><b>2</b></span>
+            <span style="--i:3;"><b>3</b></span>
+            <span style="--i:4;"><b>4</b></span>
+            <span style="--i:5;"><b>5</b></span>
+            <span style="--i:6;"><b>6</b></span>
+            <span style="--i:7;"><b>7</b></span>
+            <span style="--i:8;"><b>8</b></span>
+            <span style="--i:9;"><b>9</b></span>
+            <span style="--i:10;"><b>10</b></span>
+            <span style="--i:11;"><b>11</b></span>
+            <span style="--i:12;"><b>12</b></span>
+        </div>
+
+        <div class="aguja hora" id="aguja-hora"></div>
+        <div class="aguja minuto" id="aguja-minuto"></div>
+        <div class="aguja segundo" id="aguja-segundo"></div>
+        
+        <div class="eje-central"></div>
+    </div>
+
+    <script src="reloj-logica.js"></script>
+</body>
+</html>
