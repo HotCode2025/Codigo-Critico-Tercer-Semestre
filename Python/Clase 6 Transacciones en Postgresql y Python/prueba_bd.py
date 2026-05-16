@@ -27,4 +27,3 @@ except Exception as e:
 finally:
     conexion.close()  #DEBO CERRAR LA CONEXION CON EL FINALLY
 
-#https://www.psycopg.org/docs/usage.html
