@@ -25,4 +25,5 @@ try:
 except Exception as e:
     print(f'Ocurrio un error: {e}')
 finally:
-    conexion.close()
+    conexion.close()  #DEBO CERRAR LA CONEXION CON EL FINALLY
+
