@@ -1,0 +1,59 @@
+<diagram program="umletino" version="15.1"><zoom_level>10</zoom_level><help_text>Space for diagram notes
+fg+whi</help_text><element><id>UMLClass</id><coordinates><x>210</x><y>50</y><w>930</w><h>730</h></coordinates><panel_attributes></panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>210</x><y>20</y><w>100</w><h>30</h></coordinates><panel_attributes>acceso_datos
+fg=white
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>260</x><y>90</y><w>210</w><h>260</h></coordinates><panel_attributes>conexion
+--
+_-DATABASE: String_
+_-USERNAME: String_
+_-PASSWORD: String_
+_-DB_PORT: String_
+_-HOST: String_
+_-conexion: connection_
+_-cursor: Cursor_
+--
+_+obtenerConexion(cls): Connection_
+_+obtenerCursor(cls): Cursor_
+_+cerrar(cls)_
+--
+Responsabilidades:
+Administrar la conexión a la base
+de datos
+
+fg=white</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>650</x><y>90</y><w>210</w><h>190</h></coordinates><panel_attributes>Persona
+--
+-id_persona: int
+-nombre: String
+-apellido: String
+-email: String
+--
++__str__(): String
++metodo Get/Set de cada atributo
+--
+Responsabilidades:
+Crear objetos de la entidad de
+Persona
+
+fg=white</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>670</x><y>400</y><w>210</w><h>240</h></coordinates><panel_attributes>PersonaDao
+--
+_-SELECCIONAR: String_
+_-INSERTAR: String_
+_-ACTUALIZAR: String_
+_-ELIMINAR: String_
+--
+_+seleccionar(cls)_
+_+insertar(cls, persona)_
+_+actualizar(cls, persona)_
+_+eliminar(cls, persona)_
+--
+Responsabilidades:
+Realizar las operaciones sobre la
+base de datos de la entidad
+Persona
+
+fg=white
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>750</x><y>270</y><w>30</w><h>150</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
+fg=white
+</panel_attributes><additional_attributes>10;130;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>340</x><y>510</y><w>350</w><h>40</h></coordinates><panel_attributes>lt=&lt;&lt;&lt;&lt;-
+fg=white
+</panel_attributes><additional_attributes>330;20;10;20</additional_attributes></element><element><id>Relation</id><coordinates><x>340</x><y>340</y><w>30</w><h>210</h></coordinates><panel_attributes>fg=white
+</panel_attributes><additional_attributes>10;10;10;190</additional_attributes></element></diagram>
