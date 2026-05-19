@@ -1,6 +1,5 @@
 #Declaramos una variable
 try:
-<<<<<<< HEAD
     archivo = open('Prueba.txt', 'w', encoding='utf8') # La W es de WRITE que significa ESCRIBIR
     archivo.write('Programamos con diferentes tipos de archivos, ahora en txt.\n')
     archivo.write('Los acentos son importantes para las palabras\n')
@@ -9,15 +8,9 @@ try:
     archivo.write('\nt esta es para texto o text, \nb archivos binarios, \nw+ lee y escribe son iguales nr+\n')
     archivo.write('Saludos a todos los alumnos de la tecnicatura\n')
     archivo.write('Con esto terminamos')
-=======
-    archivo = open('Prueba.txt', 'w') # La W es de WRITE que significa ESCRIBIR
->>>>>>> 32ef831070cc4bb2bb2ce2f69ef76b59add988ed
 except Exception as e:
     print(e)
 finally: #siempre se ejecuta
     archivo.close() # Con esto se debe cerrar el archivo.
-<<<<<<< HEAD
 
 # archivo.write('Todo quedo perfecto') Este es un error
-=======
->>>>>>> 32ef831070cc4bb2bb2ce2f69ef76b59add988ed
