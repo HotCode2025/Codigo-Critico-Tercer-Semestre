@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Problema de las N Reinas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 24px; }
+    h1 { text-align: center; font-size: 24px; margin-bottom: 20px; color: #5dcaa5; }
+    .controls { display: flex; align-items: center; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    label { font-size: 14px; }
+    select, button { font-size: 14px; padding: 6px 14px; border-radius: 8px; border: 1px solid #5dcaa5; background: #16213e; color: #e0e0e0; cursor: pointer; }
+    button:hover { background: #0f3460; }
+    .stats { display: flex; gap: 16px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+    .stat { background: #16213e; border-radius: 10px; padding: 10px 20px; text-align: center; min-width: 120px; }
+    .stat-label { font-size: 12px; color: #888; }
+    .stat-value { font-size: 22px; font-weight: bold; color: #5dcaa5; }
+    .boards { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .board-wrap { text-align: center; }
+    .board-title { font-size: 13px; color: #aaa; margin-bottom: 6px; }
+    canvas { border-radius: 8px; display: block; }
+    .array-section { max-width: 700px; margin: 0 auto 16px; background: #16213e; border-radius: 10px; padding: 14px 18px; }
+    .array-title { font-size: 13px; color: #888; margin-bottom: 10px; }
+    .array-cells { display: flex; flex-wrap: wrap; gap: 8px; }
+    .arr-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .arr-idx  { font-size: 10px; color: #666; }
+    .arr-val  { width: 36px; height: 36px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold; background: #0f3460; border: 1px solid #333; color: #ccc; transition: background .3s, color .3s; }
+    .arr-val.queen { background: #1D9E75; border-color: #0F6E56; color: #E1F5EE; }
+    .log { max-width: 700px; margin: 0 auto; background: #16213e; border-radius: 10px; padding: 10px 18px; font-size: 13px; color: #aaa; min-height: 38px; }
+
+    /* ===== SOLUCIÓN JS EN UN <pre> para visualizar código ===== */
+    .code-section { max-width: 700px; margin: 20px auto 0; background: #0d1117; border-radius: 10px; padding: 16px 18px; overflow-x: auto; }
+    .code-section h2 { font-size: 14px; color: #5dcaa5; margin-bottom: 12px; }
+    pre { font-size: 12px; color: #c9d1d9; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<h1>♛ Problema de las N Reinas</h1>
+
+<div class="controls">
+  <label for="nSel">Valor de N:</label>
+  <select id="nSel">
+    <option value="8" selected>8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+  </select>
+  <label for="spSel">Velocidad:</label>
+  <select id="spSel">
+    <option value="400">Lenta</option>
+    <option value="100" selected>Normal</option>
+    <option value="20">Rápida</option>
+    <option value="1">Instantáneo</option>
+  </select>
+  <button onclick="startSolve()">▶ Resolver</button>
+  <button onclick="resetAll()">↺ Reiniciar</button>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-label">Pasos</div><div class="stat-value" id="sSteps">0</div></div>
+  <div class="stat"><div class="stat-label">Reinas ubicadas</div><div class="stat-value" id="sQueens">0</div></div>
+  <div class="stat"><div class="stat-label">Estado</div><div class="stat-value" id="sStatus" style="font-size:14px;padding-top:4px">Esperando</div></div>
+</div>
+
+<div class="boards">
+  <div class="board-wrap">
+    <div class="board-title">Tablero en progreso</div>
+    <canvas id="cvLive" width="320" height="320"></canvas>
+  </div>
+  <div class="board-wrap">
+    <div class="board-title">Tablero terminado</div>
+    <canvas id="cvFinal" width="320" height="320"></canvas>
+  </div>
+</div>
+
+<div class="array-section">
+  <div class="array-title">Arreglo de posiciones — queens[fila] = columna</div>
+  <div class="array-cells" id="arrDisplay"></div>
+</div>
+
+<div class="log" id="logMsg">Seleccioná N y presioná Resolver.</div>
+
+<div class="code-section">
+  <h2>Algoritmo: Backtracking en JavaScript</h2>
+  <pre id="codeDisplay"></pre>
+</div>
+
+<script>
+/* ============================================================
+   ALGORITMO DE BACKTRACKING — N REINAS
+   queens[fila] = columna donde está la reina en esa fila
+   ============================================================ */
+
+/**
+ * Verifica si es seguro colocar una reina en (row, col)
+ * dado el estado actual del arreglo queens.
+ */
+function isSafe(queens, row, col) {
+  for (let r = 0; r < row; r++) {
+    // misma columna o misma diagonal
+    if (queens[r] === col) return false;
+    if (Math.abs(queens[r] - col) === Math.abs(r - row)) return false;
+  }
+  return true;
+}
+
+/**
+ * Genera todos los eventos del backtracking para animación.
+ * Retorna el arreglo de eventos: { type, row, col, q, step }
+ */
+function collectEvents(n) {
+  const events = [];
+  const queens = new Array(n).fill(-1);
+  let stepCount = 0;
+
+  function backtrack(row) {
+    if (row === n) {
+      events.push({ type: 'done', q: [...queens] });
+      return true;
+    }
+    for (let col = 0; col < n; col++) {
+      stepCount++;
+      if (isSafe(queens, row, col)) {
+        queens[row] = col;
+        events.push({ type: 'place', row, col, q: [...queens], step: stepCount });
+        if (backtrack(row + 1)) return true;
+        queens[row] = -1;
+        events.push({ type: 'back', row, col, q: [...queens], step: ++stepCount });
+      }
+    }
+    return false;
+  }
+
+  backtrack(0);
+  return events;
+}
+
+/* ============================================================
+   VISUALIZACIÓN
+   ============================================================ */
+
+let N = 8, solving = false, cancelled = false;
+let animQueue = [], animTimer = null;
+
+const C_LIGHT = '#2a2a4a';
+const C_DARK  = '#1a1a2e';
+const C_QUEEN = '#1D9E75';
+const C_BACK  = '#E24B4A';
+const C_CURR  = 'rgba(239,159,39,0.2)';
+const C_BACK_HL = 'rgba(226,75,74,0.2)';
+
+function initUI() {
+  N = +document.getElementById('nSel').value;
+  ['cvLive','cvFinal'].forEach(id => {
+    const cv = document.getElementById(id);
+    cv.width = 320; cv.height = 320;
+    drawBoard(cv.getContext('2d'), [], -1, false);
+  });
+  buildArrayUI([]);
+}
+
+function drawBoard(ctx, q, curRow, isBack) {
+  const sz = ctx.canvas.width;
+  const cell = sz / N;
+  ctx.clearRect(0, 0, sz, sz);
+
+  // casillas
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      ctx.fillStyle = (r + c) % 2 === 0 ? '#3b3b6b' : '#22224a';
+      ctx.fillRect(c * cell, r * cell, cell, cell);
+    }
+  }
+
+  // fila activa
+  if (curRow >= 0) {
+    ctx.fillStyle = isBack ? C_BACK_HL : C_CURR;
+    ctx.fillRect(0, curRow * cell, sz, cell);
+  }
+
+  // reinas
+  for (let r = 0; r < q.length; r++) {
+    if (q[r] < 0) continue;
+    const cx = q[r] * cell + cell / 2;
+    const cy = r * cell + cell / 2;
+    const rm = cell * 0.36;
+    const red = r === curRow && isBack;
+
+    ctx.save();
+    ctx.fillStyle = red ? C_BACK : C_QUEEN;
+    ctx.shadowColor = ctx.fillStyle;
+    ctx.shadowBlur = 8;
+    // corona simple (pentágono)
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - rm);
+    ctx.lineTo(cx + rm * 0.4, cy - rm * 0.2);
+    ctx.lineTo(cx + rm, cy + rm * 0.5);
+    ctx.lineTo(cx - rm, cy + rm * 0.5);
+    ctx.lineTo(cx - rm * 0.4, cy - rm * 0.2);
+    ctx.closePath();
+    ctx.fill();
+    // círculo interior
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = red ? '#7a1a1a' : '#085041';
+    ctx.beginPath();
+    ctx.arc(cx, cy + rm * 0.1, rm * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // borde
+  ctx.strokeStyle = '#5dcaa5';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(0, 0, sz, sz);
+}
+
+function buildArrayUI(q) {
+  const div = document.getElementById('arrDisplay');
+  div.innerHTML = '';
+  for (let i = 0; i < N; i++) {
+    const isQ = q[i] >= 0;
+    div.innerHTML += `
+      <div class="arr-cell">
+        <span class="arr-idx">f${i}</span>
+        <div class="arr-val ${isQ ? 'queen' : ''}" id="ac${i}">${isQ ? q[i] : '-'}</div>
+      </div>`;
+  }
+}
+
+function setArrayCell(row, val, isQueen) {
+  const el = document.getElementById('ac' + row);
+  if (!el) return;
+  el.textContent = val >= 0 ? val : '-';
+  el.className = 'arr-val' + (isQueen ? ' queen' : '');
+}
+
+/* ============================================================
+   ANIMACIÓN DE EVENTOS
+   ============================================================ */
+function resetAll() {
+  cancelled = true;
+  clearTimeout(animTimer);
+  animQueue = [];
+  solving = false;
+  document.getElementById('sSteps').textContent = '0';
+  document.getElementById('sQueens').textContent = '0';
+  document.getElementById('sStatus').textContent = 'Esperando';
+  document.getElementById('logMsg').textContent = 'Reiniciado. Presioná Resolver.';
+  initUI();
+}
+
+function startSolve() {
+  if (solving) return;
+  cancelled = false;
+  solving = true;
+  N = +document.getElementById('nSel').value;
+  initUI();
+  document.getElementById('sStatus').textContent = 'Resolviendo...';
+  document.getElementById('logMsg').textContent = `Backtracking para N=${N} iniciado...`;
+
+  animQueue = collectEvents(N);
+  processNext();
+}
+
+function processNext() {
+  if (cancelled || animQueue.length === 0) return;
+  const ev = animQueue.shift();
+  const sp = +document.getElementById('spSel').value;
+  const cvL = document.getElementById('cvLive').getContext('2d');
+  const cvF = document.getElementById('cvFinal').getContext('2d');
+
+  if (ev.type === 'place') {
+    document.getElementById('sSteps').textContent = ev.step;
+    document.getElementById('sQueens').textContent = ev.q.filter(v => v >= 0).length;
+    document.getElementById('logMsg').textContent =
+      `Fila ${ev.row}: colocando reina en columna ${ev.col} ✓`;
+    drawBoard(cvL, ev.q, ev.row, false);
+    setArrayCell(ev.row, ev.col, true);
+
+  } else if (ev.type === 'back') {
+    document.getElementById('sSteps').textContent = ev.step;
+    document.getElementById('sQueens').textContent = ev.q.filter(v => v >= 0).length;
+    document.getElementById('logMsg').textContent =
+      `Fila ${ev.row}: backtrack — columna ${ev.col} no funciona ↩`;
+    const tmpQ = [...ev.q];
+    tmpQ[ev.row] = ev.col;
+    drawBoard(cvL, tmpQ, ev.row, true);
+    setTimeout(() => { if (!cancelled) drawBoard(cvL, ev.q, ev.row - 1, false); }, sp * 0.5);
+    setArrayCell(ev.row, -1, false);
+
+  } else if (ev.type === 'done') {
+    solving = false;
+    document.getElementById('sStatus').textContent = '✓ ¡Solución!';
+    document.getElementById('logMsg').textContent =
+      `Solución encontrada. Arreglo: [${ev.q.join(', ')}]`;
+    drawBoard(cvL, ev.q, -1, false);
+    drawBoard(cvF, ev.q, -1, false);
+    buildArrayUI(ev.q);
+    for (let i = 0; i < N; i++) setArrayCell(i, ev.q[i], true);
+    return;
+  }
+
+  animTimer = setTimeout(processNext, sp);
+}
+
+/* Mostrar el código del algoritmo en pantalla */
+document.getElementById('codeDisplay').textContent = `
+function isSafe(queens, row, col) {
+  for (let r = 0; r < row; r++) {
+    if (queens[r] === col) return false;
+    if (Math.abs(queens[r] - col) === Math.abs(r - row)) return false;
+  }
+  return true;
+}
+
+function solveNQueens(n) {
+  const queens = new Array(n).fill(-1);
+
+  function backtrack(row) {
+    if (row === n) {
+      console.log("Solucion:", queens);
+      return true;
+    }
+    for (let col = 0; col < n; col++) {
+      if (isSafe(queens, row, col)) {
+        queens[row] = col;           // colocar reina
+        if (backtrack(row + 1)) return true;
+        queens[row] = -1;            // backtrack
+      }
+    }
+    return false;
+  }
+
+  backtrack(0);
+  return queens;
+}
+
+// Ejemplo de uso:
+const resultado = solveNQueens(8);
+console.log(resultado);
+// Para N=8 -> [0, 4, 7, 5, 2, 6, 1, 3]
+// queens[fila] = columna donde está la reina
+`;
+
+initUI();
+</script>
+
+</body>
+</html>
