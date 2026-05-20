@@ -32,3 +32,6 @@
 /Java/Clase4/Overriding/Sobreescritura/nbproject/private/
 /Java/Clase4/Overriding/Sobreescritura/build/
 
+venv/
+Sistema Demo/
+*.log
