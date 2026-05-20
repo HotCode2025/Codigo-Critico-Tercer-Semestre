@@ -36,3 +36,9 @@ __pycache__/
 venv/
 ENV/
 env/
+
+# ====================================================================
+# EXCEPCIONES ESPECÍFICAS
+# ====================================================================
+# Permitir explícitamente el log de la capa de datos de Python
+!Python/Clase 7 Capa de Datos - Logging y Postgresql/capa_datos_persona/capa_datos.log
