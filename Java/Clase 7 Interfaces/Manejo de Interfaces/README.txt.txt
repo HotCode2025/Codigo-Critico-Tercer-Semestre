@@ -1,0 +1,1 @@
+7.1 Visto el video introductorio donde se explica las diferencias de clases abstractas vs interfaces
