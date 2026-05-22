@@ -1,0 +1,60 @@
+distribuidora_app/
+│
+├── config/
+│   ├── parametros_generales.py       # Carga/guarda configuración (moneda, empresa, etc.)
+│   └── constantes.py                # Rutas, textos fijos, formatos
+│
+├── db/
+│   ├── db_manager.py                # Conexión SQLite, creación de tablas, migraciones
+│   └── script_creacion.sql          # Script SQL puro (adjunto más abajo)
+│
+├── modelos/                         # Clases que representan las entidades
+│   ├── cliente.py
+│   ├── preventista.py
+│   ├── producto.py
+│   ├── lote.py
+│   ├── nota_venta.py
+│   ├── factura.py
+│   ├── cuenta_corriente.py
+│   ├── cobro.py
+│   └── catalogo.py
+│
+├── vistas/                          # GUI profesional (ventanas, widgets, reportes visuales)
+│   ├── ventana_principal.py
+│   ├── clientes/
+│   ├── productos/
+│   ├── stock/
+│   ├── preventistas/
+│   ├── facturacion/
+│   ├── parametros/
+│   ├── reportes/
+│   └── alertas/
+│
+├── controladores/                   # Lógica de negocio (puente entre GUI y modelos)
+│   ├── controlador_clientes.py
+│   ├── controlador_productos.py
+│   ├── controlador_stock.py
+│   ├── controlador_ventas.py
+│   ├── controlador_cuentacorriente.py
+│   ├── controlador_preventistas.py
+│   ├── controlador_reportes.py
+│   └── controlador_pdf.py
+│
+├── reportes/                        # Plantillas y generación de reportes (PDF, Excel, impresión)
+│   ├── generador_reportes.py
+│   └── plantillas/
+│
+|── pdf/                             # Módulo de lectura de catálogos
+│   ├── lector_pdf.py
+│   └── extractor_datos.py├
+|
+├── utilidades/
+│   ├── validaciones.py
+│   ├── fechas.py
+│   ├── calculos.py                  # Cálculo de ganancias, márgenes, IVA
+│   └── alertas.py                   # Motor de alertas programadas
+│
+├── assets/                          # Logo, íconos, imágenes
+│   └── logo.png
+│
+└── main.py                          # Punto de entrada de la aplicación
