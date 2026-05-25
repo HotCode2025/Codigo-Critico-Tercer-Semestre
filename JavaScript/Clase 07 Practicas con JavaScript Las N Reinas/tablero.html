@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad Grupal: N-Reinas con Reloj de Ajedrez y Logo</title>
+    <style>
+        /* --- ESTILOS GENERALES DE LA WEB --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f1ea; /* Fondo crema suave, estilo antiguo */
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative; /* Permite posicionar el logo de forma absoluta respecto al cuerpo */
+        }
+        h1, h3 { color: #4a3b32; margin-bottom: 5px; margin-top: 0; }
+        
+        /* ---  LOGO ORIGINAL  --- */
+        .contenedor-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000; /* Asegura que el logo flote por encima de todo */
+        }
+        .logo-pequeno {
+            width: 90px; /* Tamaño chico original */
+            height: auto;
+            border-radius: 8px; /* Bordes suaves como al principio */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* Sombra para relieve */
+        }
+
+        /* --- PANEL DE CONTROL (INPUT N) --- */
+        .control-panel { 
+            margin-bottom: 15px; 
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL DE DOS COLUMNAS --- */
+        .zona-juego {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            align-items: flex-start;
+            justify-content: center;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        /* --- COLUMNA IZQUIERDA:  --- */
+        .columna-izquierda {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1.2; /* Mismo factor de crecimiento para garantizar idéntico ancho */
+            width: 100%;
+            margin-top: 100px; /* Incrementado para bajar el bloque 4 interlíneas más */
+        }
+
+        /* --- COLUMNA DERECHA: RELOJ DE AJEDREZ Y TABLERO GRÁFICO --- */
+        .columna-derecha {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* --- PANEL DE DATOS DE LA CONSIGNA -- */
+        .info-panel {
+            background: #000080; /* Azul DOS */
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            border: 4px double #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .info-panel h3 {
+            color: #ffff55; /* Título amarillo */
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-size: 13px; /* Título achicado */
+        }
+        .info-panel p {
+            margin: 3px 0;
+            font-size: 11px; /* Letras de los datos achicadas */
+        }
+        .info-panel strong {
+            color: #55ffff; /* Cyan brillante */
+        }
+        .array-box {
+            background-color: #000000;
+            color: #00ff00; /* Verde fósforo */
+            padding: 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px; /* Letras del arreglo achicadas */
+            text-align: center;
+            border: 1px solid #aaaaaa;
+            margin-top: 3px;
+            font-weight: bold;
+        }
+
+        /* --- PANEL GRÁFICO ESTILO D.O.S. (TABLERO LÓGICO) --- */
+        .panel-grafico-der {
+            background-color: #000080; /* Azul clásico de DOS */
+            color: #aaaaaa; /* Texto gris */
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            line-height: 1.2;
+            overflow-x: auto;
+            border: 4px double #ffffff; /* Borde doble */
+            box-sizing: border-box;
+            width: 100%;
+        }
+        .panel-grafico-der h3 {
+            color: #ffff55; /* Amarillo brillante */
+            font-family: 'Courier New', Courier, monospace;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+        .matriz-texto {
+            white-space: pre;
+            display: inline-block;
+            text-align: left; 
+        }
+        .contenedor-matriz-centrada {
+            text-align: center; /* Centra el bloque de texto respecto al contenedor */
+            width: 100%;
+        }
+        .reina-texto {
+            color: #ff5555; /* Reina roja en DOS */
+            font-weight: bold;
+        }
+
+        /* --- ESTILOS DEL RELOJ DE AJEDREZ --- */
+        .reloj-ajedrez {
+            display: flex;
+            background-color: #2b1d14; /* Madera oscura */
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            gap: 15px;
+            border: 4px solid #4a3b32;
+            justify-content: center;
+            align-items: center;
+            width: fit-content;
+        }
+        .pantalla-reloj {
+            background-color: #111; /* Fondo negro digital */
+            color: #ff3333; /* Números rojos brillantes */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 26px;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 2px solid #555;
+            text-align: center;
+            min-width: 85px;
+            box-shadow: inset 0 0 8px rgba(255,0,0,0.5);
+        }
+        .reloj-btn {
+            background-color: #8d6e63;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 3px #5d4037;
+            transition: all 0.1s;
+            text-transform: uppercase;
+        }
+        .reloj-btn:active {
+            box-shadow: 0 1px #5d4037;
+            transform: translateY(2px);
+        }
+        .reloj-btn.activo {
+            background-color: #4caf50;
+            box-shadow: 0 3px #388e3c;
+            animation: palpitacion 1.5s infinite;
+        }
+        @keyframes palpitacion {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        /* --- TABLERO DE AJEDREZ GRÁFICO --- */
+        .tablero-container {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border: 12px solid #5d4037; /* Marco grueso de madera */
+            border-radius: 4px;
+            background-color: #5d4037;
+        }
+        .tablero {
+            display: grid;
+            background-color: #b0bec5;
+        }
+        .casilla {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 35px;
+        }
+        .clara { background-color: #d7ccc8; }
+        .oscura { background-color: #8d6e63; }
+        
+        /* Icono de la Reina Roja en Tablero Gráfico */
+        .reina {
+            color: #ff3333; 
+            text-shadow: 0 0 5px #000, 2px 2px 3px rgba(0,0,0,0.6); 
+            animation: aparecer 0.2s ease-out; 
+        }
+        @keyframes aparecer {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* --- CRÉDITOS --- */
+        .creditos {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7d6b5d;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor-logo">
+        <img src="codigocritico.jpg" alt="Logo Código Crítico" class="logo-pequeno">
+    </div>
+
+    <h1>Problema de las N-Reinas</h1>
+    
+    <div class="control-panel">
+        <label for="inputN"><strong>Tamaño del Tablero (N):</strong> </label>
+        <input type="number" id="inputN" value="8" min="8" max="12" style="width: 50px; padding: 5px; font-size: 16px;">
+    </div>
+
+    <div class="zona-juego">
+        
+        <div class="columna-izquierda">
+            
+            <div class="info-panel">
+                <h3>Datos de la Consigna:</h3>
+                <p><strong>Valor N planteado:</strong> <span id="valorN" style="color: #ffff55; font-weight: bold;">8</span></p>
+                <p><strong>Arreglo de índices (Resultado):</strong></p>
+                <div id="arregloIndices" class="array-box">[ ]</div>
+            </div>
+
+            <div id="panelGraficoTexto" class="panel-grafico-der">
+                <h3>MAPEO LOGICO (MECANISMO D.O.S.)</h3>
+                <div class="contenedor-matriz-centrada">
+                    <div id="contenidoMatrizTexto" class="matriz-texto">Cargando sistema operativo... Presione "Pulsar Reloj" para calcular la matriz.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="columna-derecha">
+            
+            <div class="reloj-ajedrez">
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <div id="tiempoAlgoritmo" class="pantalla-reloj">00:00.0</div>
+                    <button id="btnReloj" class="reloj-btn" onclick="presionarReloj()">Pulsar Reloj</button>
+                </div>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+                    <div id="tiempoEstado" class="pantalla-reloj" style="color: #00ff00; font-size: 18px; line-height: 32px; min-width: 120px;">DETENIDO</div>
+                    <button class="reloj-btn" onclick="reiniciarTodo()" style="background-color: #78909c; box-shadow: 0 3px #546e7a;">Reset</button>
+                </div>
+            </div>
+
+            <div class="tablero-container">
+                <div id="tableroAjedrez" class="tablero"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="creditos">
+        Desarrollado por Código Crítico, Tercer Semestre - 2026
+    </div>
+
+    <script>
+        // --- VARIABLES GLOBALES ---
+        let N = 8;                         
+        let tableroLogico = [];            
+        let pasos = [];                    
+        let intervaloMovement;           
+        let intervaloCronometro;           
+        let tiempoInicial;                 
+        let simulaciónActiva = false;      
+
+        // --- 1. CONSTRUCCIÓN DE LA CUADRÍCULA HTML/CSS ---
+        function crearTableroVisual() {
+            const contenedor = document.getElementById('tableroAjedrez');
+            contenedor.innerHTML = ''; 
+            
+            contenedor.style.gridTemplateColumns = `repeat(${N}, 60px)`;
+            contenedor.style.gridTemplateRows = `repeat(${N}, 60px)`;
+
+            for (let fila = 0; fila < N; fila++) {
+                for (let col = 0; col < N; col++) {
+                    const casilla = document.createElement('div');
+                    const casillaClass = ((fila + col) % 2 === 0) ? 'clara' : 'oscura';
+                    casilla.classList.add('casilla', casillaClass);
+                    
+                    casilla.id = `c-${fila}-${col}`; 
+                    contenedor.appendChild(casilla);
+                }
+            }
+            dibujarMecanismoInicialTexto();
+        }
+
+        //  Gráficos de caja de D.O.S. (ASCII extendido)
+        function dibujarMecanismoInicialTexto() {
+            const subPanel = document.getElementById('contenidoMatrizTexto');
+            
+            let encabezadoCols = "      ";
+            for(let c=0; c<N; c++) encabezadoCols += `C${c}  `;
+            encabezadoCols += "\n";
+
+            let bordeSuperior = "    ╔" + "═══╦".repeat(N-1) + "═══╗\n";
+            let bordeInferior = "    ╚" + "═══╩".repeat(N-1) + "═══╝\n";
+            let separadorFilas = "    ╠" + "═══╬".repeat(N-1) + "═══╣\n";
+
+            let cuerpo = "";
+            for (let f = 0; f < N; f++) {
+                cuerpo += ` F${f} ║`;
+                for (let c = 0; c < N; c++) {
+                    cuerpo += " · ║"; 
+                }
+                cuerpo += "\n";
+                if (f < N - 1) cuerpo += separadorFilas;
+            }
+
+            subPanel.innerHTML = encabezadoCols + bordeSuperior + cuerpo + bordeInferior;
+        }
+
+        // --- 2. VALIDACIONES DE REGLAS DE AJEDREZ ---
+        function esSeguro(tablero, fila, col) {
+            for (let i = 0; i < col; i++) if (tablero[fila][i] === 1) return false;
+            for (let i = fila, j = col; i >= 0 && j >= 0; i--, j--) if (tablero[i][j] === 1) return false;
+            for (let i = fila, j = col; j >= 0 && i < N; i++, j--) if (tablero[i][j] === 1) return false;
+            return true;
+        }
+
+        // --- 3. ALGORITMO RECURSIVO CON GUARDADO EXCLUSIVO (REINAS FIJAS) ---
+        function resolverNReinas(tablero, col) {
+            if (col >= N) return true;
+
+            for (let i = 0; i < N; i++) {
+                if (esSeguro(tablero, i, col)) {
+                    tablero[i][col] = 1; 
+                    
+                    if (resolverNReinas(tablero, col + 1)) {
+                        pasos.unshift(tablero.map(f => [...f])); 
+                        return true;
+                    }
+                    tablero[i][col] = 0;
+                }
+            }
+            return false; 
+        }
+
+        // --- 4. RENDERIZADOR GRÁFICO (DIBUJAR EN TABLERO Y EN MARCOS D.O.S.) ---
+        function dibujarEstado(tablero) {
+            // A) Tablero Gráfico (Derecha)
+            for (let fila = 0; fila < N; fila++) {
+                for (let col = 0; col < N; col++) {
+                    const casilla = document.getElementById(`c-${fila}-${col}`);
+                    casilla.innerHTML = (tablero[fila][col] === 1) ? '<span class="reina">♛</span>' : '';
+                }
+            }
+
+            // B) Consola D.O.S. con bordes ASCII (Izquierda - Centrada)
+            const subPanel = document.getElementById('contenidoMatrizTexto');
+            
+            let encabezadoCols = "      ";
+            for(let c=0; c<N; c++) encabezadoCols += `C${c}  `;
+            encabezadoCols += "\n";
+
+            let bordeSuperior = "    ╔" + "═══╦".repeat(N-1) + "═══╗\n";
+            let bordeInferior = "    ╚" + "═══╩".repeat(N-1) + "═══╝\n";
+            let separadorFilas = "    ╠" + "═══╬".repeat(N-1) + "═══╣\n";
+
+            let cuerpo = "";
+            for (let fila = 0; fila < N; fila++) {
+                cuerpo += ` F${fila} ║`;
+                for (let col = 0; col < N; col++) {
+                    if (tablero[fila][col] === 1) {
+                        cuerpo += '<span class="reina-texto"> ♛ </span>║'; 
+                    } else {
+                        cuerpo += " · ║";
+                    }
+                }
+                cuerpo += "\n";
+                if (fila < N - 1) cuerpo += separadorFilas;
+            }
+
+            subPanel.innerHTML = encabezadoCols + bordeSuperior + cuerpo + bordeInferior;
+        }
+
+        // --- 5. CONTROLADOR DEL RELOJ Y SECUENCIA DE 1 SEGUNDO ---
+        function presionarReloj() {
+            if (simulaciónActiva) return; 
+            
+            simulaciónActiva = true;
+            N = parseInt(document.getElementById('inputN').value);
+            if (N < 8) { alert("N debe ser mínimo 8"); simulaciónActiva = false; return; }
+
+            document.getElementById('valorN').innerText = N;
+            document.getElementById('btnReloj').classList.add('activo');
+            document.getElementById('tiempoEstado').innerText = "EJECUTANDO";
+            document.getElementById('tiempoEstado').style.color = "#ff9800";
+            document.getElementById('arregloIndices').innerText = "[ ]";
+
+            tableroLogico = Array.from({ length: N }, () => Array(N).fill(0));
+            pasos = [];
+            
+            const solucionExiste = resolverNReinas(tableroLogico, 0);
+            crearTableroVisual(); 
+
+            // Cronómetro Digital
+            tiempoInicial = Date.now();
+            intervaloCronometro = setInterval(() => {
+                let tiempoPasado = Date.now() - tiempoInicial;
+                let segundos = Math.floor(tiempoPasado / 1000);
+                let milisegundos = Math.floor((tiempoPasado % 1000) / 100);
+                document.getElementById('tiempoAlgoritmo').innerText = 
+                    `${segundos.toString().padStart(2, '0')}:${milisegundos}0.0`.substring(0, 7);
+            }, 100);
+
+            // Animación: 1 reina fija se agrega cada 1000 milisegundos
+            let pasoActual = 0;
+            intervaloMovement = setInterval(() => {
+                if (pasoActual < pasos.length) {
+                    dibujarEstado(pasos[pasoActual]); 
+                    pasoActual++;
+                } else {
+                    clearInterval(intervaloMovement); 
+                    clearInterval(intervaloCronometro);
+                    document.getElementById('btnReloj').classList.remove('activo');
+                    
+                    if (solucionExiste) {
+                        document.getElementById('tiempoEstado').innerText = "¡JAQUE MATE!";
+                        document.getElementById('tiempoEstado').style.color = "#00ff00";
+                        
+                        let indices = new Array(N);
+                        for(let f=0; f<N; f++)
+                            for(let c=0; c<N; c++)
+                                if(tableroLogico[f][c] === 1) indices[c] = f; 
+                        
+                        document.getElementById('arregloIndices').innerText = JSON.stringify(indices);
+                    } else {
+                        document.getElementById('tiempoEstado').innerText = "TABLAS (No Sol)";
+                        document.getElementById('tiempoEstado').style.color = "#ff3333";
+                    }
+                    simulaciónActiva = false; 
+                }
+            }, 1000); 
+        }
+
+        // --- 6. FUNCIÓN DE REINICIO ---
+        function reiniciarTodo() {
+            clearInterval(intervaloMovement);
+            clearInterval(intervaloCronometro);
+            simulaciónActiva = false;
+            document.getElementById('btnReloj').classList.remove('activo');
+            document.getElementById('tiempoAlgoritmo').innerText = "00:00.0";
+            document.getElementById('tiempoEstado').innerText = "DETENIDO";
+            document.getElementById('tiempoEstado').style.color = "#00ff00";
+            document.getElementById('arregloIndices').innerText = "[ ]";
+            N = parseInt(document.getElementById('inputN').value);
+            crearTableroVisual(); 
+        }
+
+        crearTableroVisual();
+    </script>
+</body>
+</html>

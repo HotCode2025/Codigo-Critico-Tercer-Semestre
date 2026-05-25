@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Problema de las N Reinas - Documentado</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #1a1a2e; color: #e0e0e0; padding: 24px; }
+    h1 { text-align: center; font-size: 24px; margin-bottom: 20px; color: #5dcaa5; }
+    .controls { display: flex; align-items: center; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    label { font-size: 14px; }
+    select, button { font-size: 14px; padding: 6px 14px; border-radius: 8px; border: 1px solid #5dcaa5; background: #16213e; color: #e0e0e0; cursor: pointer; }
+    button:hover { background: #0f3460; }
+    .stats { display: flex; gap: 16px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+    .stat { background: #16213e; border-radius: 10px; padding: 10px 20px; text-align: center; min-width: 120px; }
+    .stat-label { font-size: 12px; color: #888; }
+    .stat-value { font-size: 22px; font-weight: bold; color: #5dcaa5; }
+    .boards { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .board-wrap { text-align: center; }
+    .board-title { font-size: 13px; color: #aaa; margin-bottom: 6px; }
+    canvas { border-radius: 8px; display: block; }
+    .array-section { max-width: 700px; margin: 0 auto 16px; background: #16213e; border-radius: 10px; padding: 14px 18px; }
+    .array-title { font-size: 13px; color: #888; margin-bottom: 10px; }
+    .array-cells { display: flex; flex-wrap: wrap; gap: 8px; }
+    .arr-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .arr-idx  { font-size: 10px; color: #666; }
+    .arr-val  { width: 36px; height: 36px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: bold; background: #0f3460; border: 1px solid #333; color: #ccc; transition: background .3s, color .3s; }
+    .arr-val.queen { background: #1D9E75; border-color: #0F6E56; color: #E1F5EE; }
+    .log { max-width: 700px; margin: 0 auto; background: #16213e; border-radius: 10px; padding: 10px 18px; font-size: 13px; color: #aaa; min-height: 38px; }
+    .code-section { max-width: 700px; margin: 20px auto 0; background: #0d1117; border-radius: 10px; padding: 16px 18px; overflow-x: auto; }
+    .code-section h2 { font-size: 14px; color: #5dcaa5; margin-bottom: 12px; }
+    pre { font-size: 12px; color: #c9d1d9; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<h1>♛ Problema de las N Reinas</h1>
+
+<div class="controls">
+  <label for="nSel">Valor de N:</label>
+  <select id="nSel">
+    <option value="8" selected>8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+  </select>
+  <label for="spSel">Velocidad:</label>
+  <select id="spSel">
+    <option value="400">Lenta</option>
+    <option value="100" selected>Normal</option>
+    <option value="20">Rápida</option>
+    <option value="1">Instantáneo</option>
+  </select>
+  <button onclick="startSolve()">▶ Resolver</button>
+  <button onclick="resetAll()">↺ Reiniciar</button>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-label">Pasos</div><div class="stat-value" id="sSteps">0</div></div>
+  <div class="stat"><div class="stat-label">Reinas ubicadas</div><div class="stat-value" id="sQueens">0</div></div>
+  <div class="stat"><div class="stat-label">Estado</div><div class="stat-value" id="sStatus" style="font-size:14px;padding-top:4px">Esperando</div></div>
+</div>
+
+<div class="boards">
+  <div class="board-wrap">
+    <div class="board-title">Tablero en progreso</div>
+    <canvas id="cvLive" width="320" height="320"></canvas>
+  </div>
+  <div class="board-wrap">
+    <div class="board-title">Tablero terminado</div>
+    <canvas id="cvFinal" width="320" height="320"></canvas>
+  </div>
+</div>
+
+<div class="array-section">
+  <div class="array-title">Arreglo de posiciones — queens[fila] = columna</div>
+  <div class="array-cells" id="arrDisplay"></div>
+</div>
+
+<div class="log" id="logMsg">Seleccioná N y presioná Resolver.</div>
+
+<div class="code-section">
+  <h2>Algoritmo: Backtracking en JavaScript</h2>
+  <pre id="codeDisplay"></pre>
+</div>
+
+<script>
+/**
+ 
+ * 1. NÚCLEO DEL ALGORITMO Y CAPTURA DE EVENTOS
+
+ * El tablero se optimiza usando un arreglo unidimensional de tamaño N: 'queens'.
+ * Donde: Índice del arreglo = Fila del tablero.
+ *        Valor almacenado   = Columna elegida para la reina en esa fila.
+ * Ejemplo: queens[0] = 4 significa que en la Fila 0, la reina está en la Columna 4.
+ */
+
+/**
+ * Verifica si es seguro posicionar una reina en una coordenada específica (row, col).
+ * Evalúa colisiones basándose únicamente en las reinas colocadas en las filas superiores (0 a row-1).
+ * 
+ * @param {Array} queens - Estado actual de las posiciones de las reinas.
+ * @param {number} row - Fila donde se planea colocar la nueva reina.
+ * @param {number} col - Columna propuesta para la nueva reina.
+ * @returns {boolean} True si la casilla está libre de ataques, False si hay conflicto.
+ */
+function isSafe(queens, row, col) {
+  for (let r = 0; r < row; r++) {
+    // 1. Validación de columna: Verifica si otra reina ya ocupa la misma columna.
+    if (queens[r] === col) return false;
+    
+    // 2. Validación de diagonales: Usa la propiedad de la pendiente geométrica.
+    // Si la distancia entre filas es igual a la distancia entre columnas, están en la misma diagonal.
+    if (Math.abs(queens[r] - col) === Math.abs(r - row)) return false;
+  }
+  return true; // La casilla es segura
+}
+
+/**
+ * Simula el proceso completo de backtracking en memoria antes de mostrarlo en pantalla.
+ * Registra cada paso como un "evento" para armar una cola de animación cronológica.
+ * Esto evita problemas de sincronismo asincrónico durante la ejecución del algoritmo recursivo.
+ * 
+ * @param {number} n - Tamaño del tablero (N x N) y cantidad de reinas a colocar.
+ * @returns {Array} Lista de objetos de eventos que describen cada paso del algoritmo.
+ */
+function collectEvents(n) {
+  const events = []; // Contenedor de la "cinta cinematográfica" de pasos
+  const queens = new Array(n).fill(-1); // Inicializa el tablero vacío (-1 indica sin reina)
+  let stepCount = 0; // Contador de iteraciones/intentos globales
+
+  /**
+   * Función interna recursiva que ejecuta la estrategia de Backtracking (Búsqueda en profundidad).
+   * @param {number} row - Fila actual que el algoritmo intenta resolver.
+   */
+  function backtrack(row) {
+    // CASO BASE DE ÉXITO: Si la fila iguala a N, significa que colocamos con éxito las N reinas (filas 0 a N-1).
+    if (row === n) {
+      events.push({ type: 'done', q: [...queens] });
+      return true; // Detiene la búsqueda al encontrar la primera solución válida
+    }
+
+    // Explora sistemáticamente cada columna de la fila actual
+    for (let col = 0; col < n; col++) {
+      stepCount++; // Se registra un nuevo intento analizado
+      
+      if (isSafe(queens, row, col)) {
+        // ACCIÓN: Coloca provisionalmente la reina en la columna actual
+        queens[row] = col;
+        // Registra el evento de colocación exitosa para la interfaz gráfica
+        events.push({ type: 'place', row, col, q: [...queens], step: stepCount });
+        
+        // RECURSIÓN: Intenta resolver la siguiente fila (avanza al siguiente nivel del árbol de decisión)
+        if (backtrack(row + 1)) return true;
+        
+        // BACKTRACKING (Retroceso): Si el camino falló, remueve la reina restaurando el valor a -1
+        queens[row] = -1;
+        // Registra el evento de descarte/retroceso indicando que esta rama no sirvió
+        events.push({ type: 'back', row, col, q: [...queens], step: ++stepCount });
+      }
+    }
+    return false; // Indica que no hubo solución posible en la configuración de esta rama
+  }
+
+  backtrack(0); // Inicia el proceso desde la primera fila (Fila 0)
+  return events; // Retorna la lista con la historia completa del algoritmo
+}
+
+
+/**
+ 
+ * 2. MOTOR DE RENDERIZADO VISUAL (CANVAS Y ARREGLOS)
+ 
+ */
+
+// Variables globales de control de estado y animación
+let N = 8, solving = false, cancelled = false;
+let animQueue = [], animTimer = null;
+
+// Paleta de colores para la identidad visual del simulador
+const C_LIGHT = '#2a2a4a';
+const C_DARK  = '#1a1a2e';
+const C_QUEEN = '#1D9E75'; // Verde para reinas estables
+const C_BACK  = '#E24B4A'; // Rojo para indicar retroceso
+const C_CURR  = 'rgba(239,159,39,0.2)'; // Naranja translúcido para fila bajo análisis
+const C_BACK_HL = 'rgba(226,75,74,0.2)'; // Rojo translúcido para resaltar el error de fila
+
+/**
+ * Prepara los tableros HTML5 Canvas y el visor del arreglo al iniciar o cambiar N.
+ */
+function initUI() {
+  N = +document.getElementById('nSel').value; // Obtiene el valor numérico seleccionado de N
+  ['cvLive', 'cvFinal'].forEach(id => {
+    const cv = document.getElementById(id);
+    cv.width = 320; cv.height = 320; // Forzar dimensiones cuadradas fijas
+    drawBoard(cv.getContext('2d'), [], -1, false); // Limpia y dibuja el tablero base vacío
+  });
+  buildArrayUI([]); // Limpia y prepara las celdas del arreglo en el DOM
+}
+
+/**
+ * Dibuja la cuadrícula de ajedrez y las piezas vectoriales dentro de un lienzo Canvas de 2D.
+ * 
+ * @param {CanvasRenderingContext2D} ctx - Contexto de dibujo del lienzo canvas.
+ * @param {Array} q - Estado del arreglo de reinas a dibujar.
+ * @param {number} curRow - Índice de la fila que se encuentra actualmente bajo análisis.
+ * @param {boolean} isBack - Flag para saber si estamos en un paso de retroceso (aplica alertas rojas).
+ */
+function drawBoard(ctx, q, curRow, isBack) {
+  const sz = ctx.canvas.width;
+  const cell = sz / N; // Escala matemática: calcula dinámicamente el tamaño de la casilla según N
+  ctx.clearRect(0, 0, sz, sz); // Resetea el lienzo
+
+  // RENDERIZADO DE CASILLAS: Genera el patrón intercalado clásico del tablero de ajedrez
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      // Si la suma de fila y columna es par, aplica el color claro, de lo contrario el oscuro
+      ctx.fillStyle = (r + c) % 2 === 0 ? '#3b3b6b' : '#22224a';
+      ctx.fillRect(c * cell, r * cell, cell, cell);
+    }
+  }
+
+  // RESALTE DE FILA ACTIVA: Colorea el trasfondo de la fila sobre la que el algoritmo opera en este instante
+  if (curRow >= 0) {
+    ctx.fillStyle = isBack ? C_BACK_HL : C_CURR;
+    ctx.fillRect(0, curRow * cell, sz, cell);
+  }
+
+  // DIBUJO VECTORIAL DE LAS REINAS
+  for (let r = 0; r < q.length; r++) {
+    if (q[r] < 0) continue; // Si es -1, la fila no posee una reina asignada
+    
+    // Calcula las coordenadas centrales de la casilla correspondiente
+    const cx = q[r] * cell + cell / 2;
+    const cy = r * cell + cell / 2;
+    const rm = cell * 0.36; // Radio adaptativo para mantener la escala de la pieza respecto al tamaño de celda
+    const red = r === curRow && isBack; // Cambia a rojo si esta reina específica está siendo descartada
+
+    ctx.save();
+    ctx.fillStyle = red ? C_BACK : C_QUEEN;
+    ctx.shadowColor = ctx.fillStyle;
+    ctx.shadowBlur = 8; // Efecto de brillo de estado activo
+
+    // Construcción del trazado de una corona de 5 puntas simplificada
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - rm);
+    ctx.lineTo(cx + rm * 0.4, cy - rm * 0.2);
+    ctx.lineTo(cx + rm, cy + rm * 0.5);
+    ctx.lineTo(cx - rm, cy + rm * 0.5);
+    ctx.lineTo(cx - rm * 0.4, cy - rm * 0.2);
+    ctx.closePath();
+    ctx.fill();
+
+    // Dibuja el centro circular decorativo interno de la corona
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = red ? '#7a1a1a' : '#085041';
+    ctx.beginPath();
+    ctx.arc(cx, cy + rm * 0.1, rm * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Borde externo de contención del tablero
+  ctx.strokeStyle = '#5dcaa5';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(0, 0, sz, sz);
+}
+
+/**
+ * Construye de forma dinámica los nodos HTML del arreglo visual de posiciones (queens[fila] = columna).
+ * Permite que el usuario vea la estructura de datos interna mapeada en tiempo real.
+ * 
+ * @param {Array} q - Estado inicial del arreglo de posiciones.
+ */
+function buildArrayUI(q) {
+  const div = document.getElementById('arrDisplay');
+  div.innerHTML = ''; // Vacía el contenedor existente
+  for (let i = 0; i < N; i++) {
+    const isQ = q[i] >= 0;
+    div.innerHTML += `
+      <div class="arr-cell">
+        <span class="arr-idx">f${i}</span>
+        <div class="arr-val ${isQ ? 'queen' : ''}" id="ac${i}">${isQ ? q[i] : '-'}</div>
+      </div>`;
+  }
+}
+
+/**
+ * Modifica directamente una celda específica del arreglo en el DOM sin tener que reconstruir todo el panel.
+ * 
+ * @param {number} row - Índice de la fila/celda a actualizar.
+ * @param {number} val - Valor de la columna a inyectar (o -1 si está vacía).
+ * @param {boolean} isQueen - Controla si se le asignan los estilos css CSS de celda ocupada.
+ */
+function setArrayCell(row, val, isQueen) {
+  const el = document.getElementById('ac' + row);
+  if (!el) return;
+  el.textContent = val >= 0 ? val : '-';
+  el.className = 'arr-val' + (isQueen ? ' queen' : '');
+}
+
+
+/**
+ 
+ * 3. CONTROL DE FLUJO, TIMERS Y LOOP DE ANIMACIÓN
+ * 
+ */
+
+/**
+ * Detiene cualquier proceso en ejecución y devuelve la interfaz a su estado original neutro.
+ */
+function resetAll() {
+  cancelled = true; // Alertas para detener inmediatamente el loop asincrónico activo
+  clearTimeout(animTimer); // Destruye el temporizador activo en memoria
+  animQueue = []; // Vacía la cola de tareas pendientes
+  solving = false; // Libera el candado de ejecución
+  
+  // Resetea marcadores en pantalla
+  document.getElementById('sSteps').textContent = '0';
+  document.getElementById('sQueens').textContent = '0';
+  document.getElementById('sStatus').textContent = 'Esperando';
+  document.getElementById('logMsg').textContent = 'Reiniciado. Presioná Resolver.';
+  initUI(); // Redibuja los entornos limpios
+}
+
+/**
+ * Disparador principal. Ejecuta la recolección matemática e inicia el bucle de renderizado interactivo.
+ */
+function startSolve() {
+  if (solving) return; // Candado: Evita múltiples ejecuciones en paralelo si clickean repetidamente
+  cancelled = false;
+  solving = true;
+  N = +document.getElementById('nSel').value; // Lee el N seleccionado
+  initUI();
+  document.getElementById('sStatus').textContent = 'Resolviendo...';
+  document.getElementById('logMsg').textContent = `Backtracking para N=${N} iniciado...`;
+
+  // 1. Ejecución síncrona inmediata en memoria y guardado de pasos en cola
+  animQueue = collectEvents(N);
+  
+  // 2. Comienzo del desapilado asincrónico visual
+  processNext();
+}
+
+/**
+ * Bucle recursivo asincrónico que consume la cola de eventos y dibuja los cambios según el reloj.
+ */
+function processNext() {
+  // Caso de interrupción: Si se presionó reiniciar o ya no restan eventos en la cola, salimos del ciclo.
+  if (cancelled || animQueue.length === 0) return;
+  
+  const ev = animQueue.shift(); // Extrae el primer paso de la cola (Estructura FIFO)
+  const sp = +document.getElementById('spSel').value; // Lee los milisegundos de delay seleccionados
+  const cvL = document.getElementById('cvLive').getContext('2d');
+  const cvF = document.getElementById('cvFinal').getContext('2d');
+
+  // MANEJO DE EVENTO: UBICACIÓN DE PIEZA (PLACE)
+  if (ev.type === 'place') {
+    document.getElementById('sSteps').textContent = ev.step;
+    document.getElementById('sQueens').textContent = ev.q.filter(v => v >= 0).length; // Cuenta cuántas celdas != -1 hay
+    document.getElementById('logMsg').textContent = `Fila ${ev.row}: colocando reina en columna ${ev.col} ✓`;
+    
+    drawBoard(cvL, ev.q, ev.row, false); // Dibuja la mesa con la pieza nueva
+    setArrayCell(ev.row, ev.col, true);  // Actualiza el nodo del arreglo visual en verde
+
+  // MANEJO DE EVENTO: RETROCESO (BACKTRACK)
+  } else if (ev.type === 'back') {
+    document.getElementById('sSteps').textContent = ev.step;
+    document.getElementById('sQueens').textContent = ev.q.filter(v => v >= 0).length;
+    document.getElementById('logMsg').textContent = `Fila ${ev.row}: backtrack — columna ${ev.col} no funciona ↩`;
+    
+    // Genera un clon transitorio que incluye la reina fallida pintada de rojo para dar retroalimentación visual clara
+    const tmpQ = [...ev.q];
+    tmpQ[ev.row] = ev.col;
+    drawBoard(cvL, tmpQ, ev.row, true);
+    
+    // Retraso de medio ciclo para sostener el color rojo antes de borrarla formalmente de la escena
+    setTimeout(() => { 
+      if (!cancelled) drawBoard(cvL, ev.q, ev.row - 1, false); 
+    }, sp * 0.5);
+    
+    setArrayCell(ev.row, -1, false); // Vuelve la celda del arreglo HTML a su estado vacío "-"
+
+  // MANEJO DE EVENTO: SOLUCIÓN ENCONTRADA (DONE)
+  } else if (ev.type === 'done') {
+    solving = false; // Abre el candado global de ejecución
+    document.getElementById('sStatus').textContent = '✓ ¡Solución!';
+    document.getElementById('logMsg').textContent = `Solución encontrada. Arreglo: [${ev.q.join(', ')}]`;
+    
+    drawBoard(cvL, ev.q, -1, false); // Estabiliza el canvas interactivo
+    drawBoard(cvF, ev.q, -1, false); // Clona el resultado exitoso final en el canvas estático derecho
+    buildArrayUI(ev.q); // Reconstruye el panel del arreglo al 100% estable
+    for (let i = 0; i < N; i++) setArrayCell(i, ev.q[i], true);
+    return; // Finaliza el ciclo e interrumpe los setTimeouts posteriores
+  }
+
+  // Agenda el procesamiento del paso siguiente respetando el delay configurado por el usuario
+  animTimer = setTimeout(processNext, sp);
+}
+
+/**
+ 
+ * 4. INICIALIZACIÓN DE TEXTO EN PANTALLA Y ARRANQUE INICIAL
+ 
+ */
+
+// Inyecta de forma literal el texto plano del código base dentro de las etiquetas <pre> para visualización del estudiante
+document.getElementById('codeDisplay').textContent = `
+function isSafe(queens, row, col) {
+  for (let r = 0; r < row; r++) {
+    if (queens[r] === col) return false;
+    if (Math.abs(queens[r] - col) === Math.abs(r - row)) return false;
+  }
+  return true;
+}
+
+function solveNQueens(n) {
+  const queens = new Array(n).fill(-1);
+
+  function backtrack(row) {
+    if (row === n) {
+      console.log("Solucion:", queens);
+      return true;
+    }
+    for (let col = 0; col < n; col++) {
+      if (isSafe(queens, row, col)) {
+        queens[row] = col;           // colocar reina
+        if (backtrack(row + 1)) return true;
+        queens[row] = -1;            // backtrack
+      }
+    }
+    return false;
+  }
+
+  backtrack(0);
+  return queens;
+}
+
+// Ejemplo de uso:
+const resultado = solveNQueens(8);
+console.log(resultado); // Muestra para N=8 -> [0, 4, 7, 5, 2, 6, 1, 3]
+`;
+
+// Arranca el entorno gráfico por primera vez al cargar el archivo en el navegador
+initUI();
+</script>
+
+</body>
+</html>
