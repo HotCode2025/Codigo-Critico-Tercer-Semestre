@@ -57,3 +57,13 @@
             Apellido: None,
             Email: None
         
+11:21:21 AM:DEBUG [conexion.py:26] Conexión Exitosa: <connection object at 0x7b451caa8180; dsn: 'user=ariel password=xxx dbname=test_bd host=127.0.0.1 port=5432', closed: 0>
+11:23:06 AM:ERROR [conexion.py:29] Ocurrio un error: connection to server at "127.0.0.1", port 5432 failed: FATAL:  la autentificación password falló para el usuario «arie»
+connection to server at "127.0.0.1", port 5432 failed: FATAL:  la autentificación password falló para el usuario «arie»
+
+11:24:08 AM:DEBUG [conexion.py:26] Conexión Exitosa: <connection object at 0x7a8f5474c2c0; dsn: 'user=ariel password=xxx dbname=test_bd host=127.0.0.1 port=5432', closed: 0>
+11:24:08 AM:ERROR [conexion.py:42] Ocurrio un error: 'NoneType' object has no attribute 'cursor'
+11:26:24 AM:DEBUG [conexion.py:26] Conexión Exitosa: <connection object at 0x72843234c2c0; dsn: 'user=ariel password=xxx dbname=test_bd host=127.0.0.1 port=5432', closed: 0>
+11:26:24 AM:ERROR [conexion.py:42] Ocurrio un error: 'NoneType' object has no attribute 'cursor'
+11:26:47 AM:DEBUG [conexion.py:26] Conexión Exitosa: <connection object at 0x75526194c2c0; dsn: 'user=ariel password=xxx dbname=test_bd host=127.0.0.1 port=5432', closed: 0>
+11:26:47 AM:DEBUG [conexion.py:39] Se abrió correctamente el cursor: <cursor object at 0x7552619522f0; closed: 0>
