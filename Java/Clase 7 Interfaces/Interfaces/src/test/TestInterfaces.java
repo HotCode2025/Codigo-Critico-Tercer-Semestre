@@ -9,7 +9,7 @@ public class TestInterfaces {
         //datos.listar();
         //imprimir(datos);
         datos = new ImplementacionOracle();
-        //datos.listar();
+        //datos.listar(); 
         imprimir(datos);
     }
     
