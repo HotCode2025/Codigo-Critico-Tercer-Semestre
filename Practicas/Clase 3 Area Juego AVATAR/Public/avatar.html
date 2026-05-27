@@ -4,49 +4,146 @@
     <meta charset="utf-8" />
     <title>LA LEYENDA DE AANG: AVATAR</title>
     
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+      /* Estilos generales para el cuerpo de la página: tipografía, color de fondo y centro todo para que se vea prolijo */
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      /* Alineo el título principal y le doy un poco de espacio entre el texto y los iconos usando Flexbox */
+      h1 {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #2c3e50;
+      }
+
+      /* Aumento el tamaño de los iconos que están adentro del título (h1) */
+      h1 i {
+        font-size: 1.5rem;
+      }
+
+      /* A cada sección de mi juego la convierto en una "tarjeta" blanca con bordes redondeados y una sombrita */
+      section {
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Agrupo los botones de ataque para que queden uno al lado del otro, y si no entran, bajen de línea (wrap) */
+      .contenedor-botones {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+      }
+
+      /* Le doy estilo base a todos mis botones: saco los bordes feos por defecto, les pongo relleno y hago que se achiquen un poquito al hacer click (.active) */
+      button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: transform 0.2s, background-color 0.2s;
+      }
+
+      button:active {
+        transform: scale(0.95);
+      }
+
+      /* Estilo oscuro para el botón de confirmar el personaje */
+      #boton-personaje {
+        background-color: #2c3e50;
+        color: white;
+        margin-left: 15px;
+      }
+
+      /* Acá personalizo cada botón de ataque con su color de elemento correspondiente. Le agrego un efecto :hover para que cambie de color cuando le paso el mouse por arriba */
+      #boton-fuego { background-color: #ffebee; color: #c62828; }
+      #boton-fuego:hover { background-color: #ffcdd2; }
+
+      #boton-agua { background-color: #e3f2fd; color: #1565c0; }
+      #boton-agua:hover { background-color: #bbdefb; }
+
+      #boton-tierra { background-color: #e8f5e9; color: #2e7d32; }
+      #boton-tierra:hover { background-color: #c8e6c9; }
+
+      #boton-aire { background-color: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }
+      #boton-aire:hover { background-color: #e0e0e0; }
+
+      /* El botón de reiniciar al final, también oscurito para que resalte */
+      #boton-reiniciar { background-color: #37474f; color: white; }
+
+      /* Resalto los nombres de los personajes y las vidas poniéndolos en negrita */
+      span {
+        font-weight: bold;
+        color: #2c3e50;
+      }
+    </style>
   </head>
   <body>
-    <h1>AVATAR 🔥 💧 🌱 🌪️</h1>  <!--Esto es estatico, NO CAMBIA, el h1 se utiliza una vez-->
+
+    <h1>
+      AVATAR 
+      <i class="ph-duotone ph-fire" style="color: #ff4500;"></i> 
+      <i class="ph-duotone ph-drop" style="color: #1e90ff;"></i> 
+      <i class="ph-duotone ph-plant" style="color: #228b22;"></i> 
+      <i class="ph-duotone ph-wind" style="color: #a9a9a9;"></i>
+    </h1>
     
     <section id="seleccionar-personaje">
         <h2>Elige tu Personaje</h2>
         
-         <label for="zuko">Zuko</label> <!--Esta etiqueta es para darle un indicador a los usuarios de que estan seleccionado-->
-        <input type="radio" name="personaje" id="zuko"/> <!--name es para agrupar todos los inputs y poder seleccionar-->
+        <input type="radio" name="personaje" id="zuko"/>
+        <label for="zuko">Zuko</label>
 
-        <label for="katara">Katara</label> <!--E latributo for ayuda a vincular un label con un imput a traves del mismo id-->
-        <input type="radio" name="personaje" id="katara"/> <!--Acá van los personajes-->
+        <input type="radio" name="personaje" id="katara"/>
+        <label for="katara">Katara</label>
 
+        <input type="radio" name="personaje" id="aang"/>
         <label for="aang">Aang</label> 
-        <input type="radio" name="personaje" id="aang"/> <!--Le damos un atributo id para saber cual es el valor de cada uno-->
 
-        <label for="toph">Toph</label> 
         <input type="radio" name="personaje" id="toph"/>
+        <label for="toph">Toph</label>
 
-
-
-      <button id="boton-personaje">Seleccionar</button> <!--El boton para seleccionar el personaje-->
-      </section>
+        <button id="boton-personaje">Seleccionar</button>
+    </section>
 
     <section id="seleccionar-ataque">
-      <h2>Elige tu ataque</h2> <!-- Se puede utilizar varias veces-->
-      <p>Tu personaje tiene <span>3</span> vidas</p> <!--Pero este debe ser dinamico, necesitamos que cambie-->
-      <p>Los personajes del enemigo tienen <span>3</span> vidas</p> <!--Con la etiqueta spam vamos a modificar el 3 con el JS-->
-        <button id="boton-fuego">Fuego 🔥</button>
-        <button id="boton-agua">Agua 💧</button>
-        <button id="boton-tierra">Tierra 🌱</button>
-        <button id="boton-aire">Aire 🌪️</button>
-      </p>
+      <h2>Elige tu ataque</h2>
+      <p>Tu personaje <span id="personaje-jugador">-</span> tiene <span>3</span> vidas</p>
+      <p>El personaje <span id="personaje-enemigo">-</span> del enemigo tiene <span>3</span> vidas</p>
+      
+        <div class="contenedor-botones">
+            <button id="boton-fuego">Fuego <i class="ph-duotone ph-fire"></i></button>
+            <button id="boton-agua">Agua <i class="ph-duotone ph-drop"></i></button>
+            <button id="boton-tierra">Tierra <i class="ph-duotone ph-plant"></i></button>
+            <button id="boton-aire">Aire <i class="ph-duotone ph-wind"></i></button>
+        </div>
     </section>
-    <section id="mensajes"> <!--Sera un parrafo dinamico-->
+
+    <section id="mensajes">
         <p>Tu personaje atacó con todo el poder del FUEGO, el personaje del enemigo atacó con el medio poder de la TIERRA - GANASTE </p>
-        </section>
+    </section>
 
-        <section id="reiniciar">
-            <button id="boton-reiniciar">Reiniciar</button>
-        </section>
-        <script src="./js/avatar.js"></script>
+    <section id="reiniciar">
+        <button id="boton-reiniciar">Reiniciar</button>
+    </section>
 
-
+    <script src="./js/avatar.js"></script>
   </body>
 </html>
