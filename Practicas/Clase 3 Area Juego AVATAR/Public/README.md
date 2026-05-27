@@ -1,6 +1,6 @@
 # 🌪️💧🌿🔥 Avatar: La Leyenda de Aang - Mini Juego Web
 
-¡Hola! Este es un proyecto interactivo que desarrollamos para poner en práctica nuestros conocimientos de **HTML, CSS y JavaScript Vanilla**, enfocándonos fuertemente en la **manipulación del DOM** y el manejo de eventos en equipo.
+¡Hola! Este es un proyecto interactivo que desarrollamos para poner en práctica nuestros conocimientos de **HTML, CSS y JavaScript**, enfocándonos fuertemente en la **manipulación del DOM** y el manejo de eventos en equipo.
 
 La idea central es recrear un combate básico estilo Avatar, donde el jugador elige su personaje favorito y se enfrenta a un enemigo asignado al azar por el sistema.
 
