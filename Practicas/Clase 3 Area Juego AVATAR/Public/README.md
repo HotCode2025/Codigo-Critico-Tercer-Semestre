@@ -12,7 +12,7 @@ Para nosotros, entender el DOM es fundamental porque es el puente que le permite
 
 * **HTML5:** Para construir toda la estructura semántica de la interfaz (secciones, inputs tipo radio, botones).
 * **CSS3:** Para darle un diseño moderno y responsivo. Utilizamos `flexbox` para la alineación de elementos, estilizamos los botones simulando tarjetas interactivas y aplicamos transiciones para los efectos visuales (`:hover` y `:active`).
-* **JavaScript (Vanilla):** El núcleo lógico del juego. Decidimos no usar frameworks externos para afianzar nuestras bases en el lenguaje.
+* **JavaScript:** El núcleo lógico del juego. 
 * **Phosphor Icons:** Integramos esta librería externa para sumar iconografía minimalista y mejorar la experiencia visual del usuario.
 
 ## Nuestra lógica y manejo del DOM
@@ -31,4 +31,4 @@ Para que el juego funcione de manera estructurada y libre de errores, organizamo
     Desarrollamos una función matemática reutilizable usando `Math.floor(Math.random() * (max - min + 1) + min)`. Esto nos permite generar un número entero aleatorio del 1 al 4, con el cual el sistema "decide" qué personaje enemigo asignar, plasmándolo también en la interfaz mediante el DOM.
 
 ---
-*Desarrollado por el equipo **Código Crítico** - Estudiantes de Programación en UTN.*
+*Desarrollado por el equipo **Código Crítico** 
