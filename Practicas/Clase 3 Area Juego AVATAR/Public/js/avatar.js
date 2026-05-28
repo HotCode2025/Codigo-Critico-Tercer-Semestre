@@ -11,7 +11,7 @@ function iniciarJuego() {
 }
 
 function seleccionarPersonajeJugador() {
-    // Me traigo todos los inputs (los radio buttons) de mis personajes desde el HTML
+    // Me traigo todos los inputs de los personajes desde el HTML
     let inputZuko = document.getElementById('zuko')
     let inputKatara = document.getElementById('katara')
     let inputAang = document.getElementById('aang')
@@ -41,22 +41,37 @@ function seleccionarPersonajeJugador() {
 }
 
 function seleccionarPersonajeEnemigo() {
-    // Genero un número al azar entre el 1 y el 4 usando mi función ayudante
-    let personajeAleatorio = aleatorio(1, 4)
-    
     // Busco el lugar en el HTML donde voy a mostrar al enemigo
     let spanPersonajeEnemigo = document.getElementById('personaje-enemigo')
+    
+    // Capturo el nombre del personaje que el jugador ACABA de elegir para poder compararlo
+    let nombreJugador = document.getElementById('personaje-jugador').innerHTML
+    
+    // Creo una variable vacía para guardar temporalmente el personaje de la compu
+    let personajeGenerado = ''
 
-    // Dependiendo del número que tocó, le asigno un personaje a la máquina
-    if (personajeAleatorio == 1) {
-        spanPersonajeEnemigo.innerHTML = 'Zuko'
-    } else if (personajeAleatorio == 2) {
-        spanPersonajeEnemigo.innerHTML = 'Katara'
-    } else if (personajeAleatorio == 3) {
-        spanPersonajeEnemigo.innerHTML = 'Aang'
-    } else if (personajeAleatorio == 4) {
-        spanPersonajeEnemigo.innerHTML = 'Toph'
-    }
+    // Uso el bucle "do...while" para que elija un personaje.
+    // Si elige el mismo que el jugador, el bucle se repite y vuelve a tirar el dado.
+    do {
+        // Genero un número al azar entre el 1 y el 4 usando mi función ayudante
+        let personajeAleatorio = aleatorio(1, 4)
+        
+        // Dependiendo del número que tocó, le asigno un personaje a la variable temporal
+        if (personajeAleatorio == 1) {
+            personajeGenerado = 'Zuko'
+        } else if (personajeAleatorio == 2) {
+            personajeGenerado = 'Katara'
+        } else if (personajeAleatorio == 3) {
+            personajeGenerado = 'Aang'
+        } else if (personajeAleatorio == 4) {
+            personajeGenerado = 'Toph'
+        }
+        
+    //  MIENTRAS el personaje de la compu sea IGUAL al del jugador, repite todo.
+    } while (personajeGenerado === nombreJugador) 
+
+    // Una vez que sale del bucle, es porque encontró uno distinto. 
+    spanPersonajeEnemigo.innerHTML = personajeGenerado
 }
 
 // Esta es mi función ayudante para sacar números aleatorios. 
