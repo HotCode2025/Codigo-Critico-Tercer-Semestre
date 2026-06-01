@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hanoi - Código Crítico</title>
+    <style>
+        /* * ESTILOS VISUALES
+         * Le armé una paleta de colores moderna con variables para que sea fácil de cambiar.
+         * Usé un fondo oscuro porque queda más pro a la vista.
+         */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --rod-color: rgba(255, 255, 255, 0.2);
+            --base-color: rgba(255, 255, 255, 0.15);
+            
+            /* Colores en degradé para diferenciar bien los 4 discos */
+            --disk-1: linear-gradient(90deg, #00c6ff, #0072ff);
+            --disk-2: linear-gradient(90deg, #f12711, #f5af19);
+            --disk-3: linear-gradient(90deg, #11998e, #38ef7d);
+            --disk-4: linear-gradient(90deg, #8e2de2, #4a00e0);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Títulos de la cabecera */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            margin: 5px 0 0 0;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* * Contenedor principal con efecto Glassmorphism (vidrio esmerilado).
+         * Acá adentro pasa todo el juego.
+         */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .juego-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        /* * Diseño de las varillas (A, B y C). 
+         * Usé flex-direction: column-reverse para que los discos se apilen desde abajo hacia arriba.
+         */
+        .varilla {
+            position: relative;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            width: 30%;
+            height: 100%;
+        }
+
+        /* El palo vertical de la varilla */
+        .varilla::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 90%;
+            background: var(--rod-color);
+            border-radius: 10px 10px 0 0;
+            z-index: 1;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        /* La base horizontal de la varilla */
+        .varilla-base {
+            position: absolute;
+            bottom: 0;
+            width: 80%;
+            height: 12px;
+            background: var(--base-color);
+            border-radius: 6px;
+            z-index: 1;
+        }
+
+        /* * Diseño de los discos.
+         * Tienen sombra y una pequeña transición para que el movimiento no sea tan brusco.
+         */
+        .disco {
+            height: 30px;
+            border-radius: 15px;
+            z-index: 2; /* Para que tapen el palo de la varilla */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease;
+        }
+
+        /* Anchos progresivos para cumplir con las reglas de Hanoi */
+        .disco-1 { width: 35%; background: var(--disk-1); }
+        .disco-2 { width: 55%; background: var(--disk-2); }
+        .disco-3 { width: 75%; background: var(--disk-3); }
+        .disco-4 { width: 95%; background: var(--disk-4); }
+
+        /* Pantallita tipo terminal para ir mostrando los pasos de la consola */
+        .consola-wrapper {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            height: 24px;
+        }
+
+        #texto-movimiento {
+            font-family: 'Courier New', Courier, monospace;
+            color: #4ade80; /* Verde terminal */
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Controles (input de cantidad y botones) */
+        .controles {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 15px 25px;
+            border-radius: 16px;
+        }
+
+        label { color: var(--text-muted); font-weight: 500; }
+
+        input[type="number"] {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            width: 60px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        button {
+            padding: 10px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        #btn-simular {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+        }
+
+        #btn-simular:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(118, 75, 162, 0.6);
+        }
+
+        #btn-simular:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #btn-reiniciar {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #btn-reiniciar:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Torres de Hanoi</h1>
+        <p>Tercer Semestre - Grupo: Código Crítico</p>
+    </div>
+
+    <div class="glass-panel">
+        <div class="juego-container">
+            <div id="rod-A" class="varilla"><div class="varilla-base"></div></div>
+            <div id="rod-B" class="varilla"><div class="varilla-base"></div></div>
+            <div id="rod-C" class="varilla"><div class="varilla-base"></div></div>
+        </div>
+
+        <div class="consola-wrapper">
+            <p id="texto-movimiento">Sistema listo. Esperando instrucción.</p>
+        </div>
+
+        <div class="controles">
+            <label>Discos: <input type="number" id="num-disks" value="3" min="1" max="4"></label>
+            <button id="btn-simular">Iniciar Secuencia</button>
+            <button id="btn-reiniciar">Resetear</button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * LÓGICA DE JAVASCRIPT - TORRES DE HANOI
+         */
+
+        // 1. Estado lógico de las varillas (arrays para apilar y desapilar discos)
+        const varillas = { 'A': [], 'B': [], 'C': [] };
+        
+        // Referencias a los elementos del HTML
+        const uiVarillas = {
+            'A': document.getElementById('rod-A'),
+            'B': document.getElementById('rod-B'),
+            'C': document.getElementById('rod-C')
+        };
+        const inputDiscos = document.getElementById('num-disks');
+        const txtMovimiento = document.getElementById('texto-movimiento');
+        const btnSimular = document.getElementById('btn-simular');
+
+        let movimientosCalculados = [];
+        let velocidadSimulacion = 800; // Milisegundos entre cada paso visual
+
+        // 2. Función para dejar el tablero en cero y cargar los discos iniciales en la varilla A
+        function inicializarJuego() {
+            const n = parseInt(inputDiscos.value);
+            
+            // Limpiamos los arrays de memoria
+            varillas.A = []; varillas.B = []; varillas.C = [];
+            movimientosCalculados = [];
+            
+            txtMovimiento.textContent = "Sistema listo. Esperando instrucción.";
+            btnSimular.disabled = false;
+
+            // Cargamos los discos de mayor a menor (ej: 3, 2, 1) en la varilla de origen
+            for (let i = n; i >= 1; i--) {
+                varillas.A.push(i);
+            }
+            dibujarDiscos(); // Renderizamos el estado inicial en pantalla
+        }
+
+        // 3. Función que agarra los arrays (memoria) y dibuja los <div> correspondientes en el HTML
+        function dibujarDiscos() {
+            for (const key in uiVarillas) {
+                const varillaUI = uiVarillas[key];
+                const discosEnVarilla = varillas[key];
+
+                // Borramos los discos que ya estaban dibujados en esta varilla
+                const discosActuales = varillaUI.querySelectorAll('.disco');
+                discosActuales.forEach(d => d.remove());
+
+                // Dibujamos los discos en su nueva posición
+                discosEnVarilla.forEach(numDisco => {
+                    const discoElemento = document.createElement('div');
+                    discoElemento.classList.add('disco', `disco-${numDisco}`);
+                    discoElemento.textContent = numDisco; // Le pongo el numerito para que se entienda mejor
+                    varillaUI.appendChild(discoElemento);
+                });
+            }
+        }
+
+        // 4. EL ALGORITMO RECURSIVO lo fundamental de la tarea
+        // En lugar de imprimir el console.log, acá guardo el objeto de movimiento en un array 
+        // para poder reproducirlo después paso a paso con el delay.
+        function calcularTorresDeHanoi(n, origen, destino, auxiliar) {
+            // CASO BASE: Si es 1 solo disco, lo muevo directo.
+            if (n === 1) {
+                movimientosCalculados.push({ disco: 1, from: origen, to: destino });
+                return;
+            }
+            
+            // PASO 1: Muevo n-1 discos al pilar auxiliar
+            calcularTorresDeHanoi(n - 1, origen, auxiliar, destino);
+            
+            // PASO 2: Muevo el disco más grande al pilar destino
+            movimientosCalculados.push({ disco: n, from: origen, to: destino });
+            
+            // PASO 3: Traigo los n-1 discos del auxiliar al destino
+            calcularTorresDeHanoi(n - 1, auxiliar, destino, origen);
+        }
+
+        // 5. Motor asíncrono para la interfaz gráfica
+        // Esto va leyendo el array de movimientos y actualiza la pantalla con una pausa entre cada paso
+        async function ejecutarSimulacion() {
+            btnSimular.disabled = true; // Bloqueo los botones para que no rompan la animación
+            inputDiscos.disabled = true;
+
+            for (let i = 0; i < movimientosCalculados.length; i++) {
+                const mov = movimientosCalculados[i];
+                
+                // Actualizo el texto de la consola verde
+                txtMovimiento.textContent = `> Ejecutando paso ${i+1}: Moviendo disco ${mov.disco} de varilla ${mov.from} a ${mov.to}`;
+
+                // Saco el disco del array origen (.pop) y lo meto en el array destino (.push)
+                varillas[mov.from].pop();
+                varillas[mov.to].push(mov.disco);
+
+                // Mando a redibujar el HTML
+                dibujarDiscos();
+                
+                // Pausa artificial usando Promesas y setTimeout
+                await new Promise(resolve => setTimeout(resolve, velocidadSimulacion));
+            }
+
+            txtMovimiento.textContent = "> Secuencia completada exitosamente.";
+            inputDiscos.disabled = false;
+        }
+
+        // 6. Eventos de los botones de la interfaz
+        btnSimular.addEventListener('click', () => {
+            const n = parseInt(inputDiscos.value);
+            // Primero la compu calcula toda la matemática al instante
+            calcularTorresDeHanoi(n, 'A', 'C', 'B');
+            // Después arrancamos la animación visual
+            ejecutarSimulacion();
+        });
+
+        document.getElementById('btn-reiniciar').addEventListener('click', () => {
+            window.location.reload(); // Forma más rápida de resetear todo el estado
+        });
+
+        // Validaciones por si cambiamos el número de discos a mano
+        inputDiscos.addEventListener('input', () => {
+            if(inputDiscos.value > 4) inputDiscos.value = 4;
+            if(inputDiscos.value < 1) inputDiscos.value = 1;
+            inicializarJuego();
+        });
+
+        // Arrancamos el tablero ni bien carga la página
+        inicializarJuego();
+    </script>
+</body>
+</html>
