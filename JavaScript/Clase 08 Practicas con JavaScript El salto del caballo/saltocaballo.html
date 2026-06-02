@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salto del Caballo - Código Crítico</title>
+    <style>
+        /* Diseño moderno y oscuro para la presentación */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --board-dark: #334155;
+            --board-light: #cbd5e1;
+            --accent: #06b6d4; /* Cyan brillante */
+            --accent-hover: #0891b2;
+            --visited: #475569;
+            --knight-glow: #22d3ee;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .controls {
+            background-color: var(--bg-panel);
+            padding: 20px 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        button {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.4);
+        }
+
+        button:disabled {
+            background-color: #334155;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        /* Contenedor del tablero con efecto glassmorphism sutil */
+        .board-container {
+            padding: 10px;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(8, 65px); /* Casillas más grandes */
+            grid-template-rows: repeat(8, 65px);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .cell {
+            width: 65px;
+            height: 65px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .dark { background-color: var(--board-dark); color: #fff; }
+        .light { background-color: var(--board-light); color: #1e293b; }
+
+        .visited {
+            background-color: var(--visited) !important;
+            color: #cbd5e1 !important;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Estilos específicos para que el caballo resalte muchísimo */
+        .knight-icon {
+            font-size: 45px;
+            color: #fff;
+            line-height: 1;
+            /* Efecto Neón para el caballo actual */
+            text-shadow: 0 0 5px #fff, 0 0 15px var(--knight-glow), 0 0 30px var(--knight-glow);
+            animation: pulse 1s infinite alternate;
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            from { transform: scale(1); filter: drop-shadow(0 0 5px var(--knight-glow)); }
+            to { transform: scale(1.15); filter: drop-shadow(0 0 15px var(--knight-glow)); }
+        }
+
+        #status {
+            margin-top: 25px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--accent);
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>El Salto del Caballo</h1>
+        <p class="subtitle">Resolución por Backtracking - Programación III - Código Crítico</p>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn">▶ Ejecutar Algoritmo</button>
+        <button id="resetBtn">↻ Limpiar Tablero</button>
+    </div>
+
+    <div class="board-container">
+        <div class="board" id="chessboard"></div>
+    </div>
+    
+    <div id="status">Esperando inicio...</div>
+
+    <script>
+        // PROYECTO: EL SALTO DEL CABALLO
+        // Organización: HotCode2025
+        // Repositorio: Codigo-Critico-Tercer-Semestre
+        // Autores: Grupo Código Crítico
+        // Profesor: Ariel Betancud
+
+        const N = 8; // Tablero estándar de 8x8
+        const boardElement = document.getElementById('chessboard');
+        const statusElement = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Los 8 posibles movimientos del caballo (desplazamientos relativos en X e Y)
+        // Tal cual los vimos en la teoría cartesiana de la clase
+        const moveX = [2, 1, -1, -2, -2, -1, 1, 2];
+        const moveY = [1, 2, 2, 1, -1, -2, -2, -1];
+
+        let solution = [];
+        let animationInterval;
+
+        // Función para renderizar el tablero de ajedrez en el DOM
+        function createBoard() {
+            boardElement.innerHTML = '';
+            for (let i = 0; i < N; i++) {
+                for (let j = 0; j < N; j++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    // Alternamos los colores para que parezca un tablero real
+                    cell.classList.add((i + j) % 2 === 0 ? 'light' : 'dark');
+                    cell.id = `cell-${i}-${j}`;
+                    boardElement.appendChild(cell);
+                }
+            }
+        }
+
+        // Valida que el salto no se salga del tablero de 8x8 y que la casilla no esté pisada
+        function isSafe(x, y, board) {
+            return (x >= 0 && x < N && y >= 0 && y < N && board[x][y] === -1);
+        }
+
+        //  Optimización de Movimientos que se van a realizar:el algoritmo "piensa" a futuro antes de saltar.
+        // Cuenta cuántos saltos válidos hay desde una casilla específica.
+        // Lo metimos para optimizar. Si hacemos backtracking ciego, el navegador se tilda 
+        // antes de encontrar la primera solución de las trillones posibles.
+        function getDegree(board, x, y) {
+            let count = 0;
+            for (let i = 0; i < 8; i++) {
+                if (isSafe(x + moveX[i], y + moveY[i], board)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        // Función recursiva principal (Lo más IMPORTANTE del Backtracking)
+        function solveKTUtil(x, y, movei, board) {
+            // Condición de corte: Si dimos 64 saltos, pasamos por todas las casillas
+            if (movei === N * N) {
+                return true;
+            }
+
+            // En vez de probar los 8 saltos a lo bruto, los guardamos en un array para analizarlos
+            let nextMoves = [];
+            for (let k = 0; k < 8; k++) {
+                let nextX = x + moveX[k];
+                let nextY = y + moveY[k];
+                if (isSafe(nextX, nextY, board)) {
+                    nextMoves.push({
+                        x: nextX,
+                        y: nextY,
+                        degree: getDegree(board, nextX, nextY) // Calculamos qué tan "arrinconada" está la casilla
+                    });
+                }
+            }
+
+            // Ordenamos los saltos priorizando las casillas que tienen MENOS salidas.
+            // Esto reduce drásticamente las ramas del árbol de recursión.
+            nextMoves.sort((a, b) => a.degree - b.degree);
+
+            // Acá empieza la lógica de "Vuelta atrás"
+            for (let i = 0; i < nextMoves.length; i++) {
+                let nextX = nextMoves[i].x;
+                let nextY = nextMoves[i].y;
+
+                // Ensayamos el movimiento
+                board[nextX][nextY] = movei;
+                solution.push({ step: movei, x: nextX, y: nextY });
+
+                // Llamada recursiva
+                if (solveKTUtil(nextX, nextY, movei + 1, board)) {
+                    return true; // Encontramos el camino hasta el final
+                }
+
+                // VUELTA ATRÁS (Backtrack): Si el camino no sirvió, borramos la anotación
+                // y probamos con la siguiente iteración del for
+                board[nextX][nextY] = -1;
+                solution.pop();
+            }
+            return false;
+        }
+
+        // Inicializador del algoritmo
+        function solve() {
+            // Creamos una matriz de 8x8 llena de -1 (casillas no visitadas)
+            let board = Array.from({ length: N }, () => Array(N).fill(-1));
+            solution = []; 
+
+            // Posición inicial: Arrancamos en el origen (0,0) como pide el profe
+            board[0][0] = 0;
+            solution.push({ step: 0, x: 0, y: 0 });
+
+            if (!solveKTUtil(0, 0, 1, board)) {
+                statusElement.innerText = "Error: No se encontró solución.";
+                return false;
+            }
+            return true;
+        }
+
+        // Función para mostrar la solución paso a paso en el DOM para la presentación de Zoom
+        function animateSolution() {
+            startBtn.disabled = true;
+            let currentStep = 0;
+            statusElement.innerText = "Calculando la mejor ruta...";
+
+            // Si el algoritmo encuentra la ruta (es casi instantáneo por Warnsdorff), la animamos
+            if (solve()) {
+                statusElement.innerText = "¡Ruta calculada! Iniciando simulación...";
+                
+                animationInterval = setInterval(() => {
+                    if (currentStep >= solution.length) {
+                        clearInterval(animationInterval);
+                        statusElement.innerText = "¡Recorrido completado! Las 64 casillas fueron visitadas.";
+                        startBtn.disabled = false;
+                        return;
+                    }
+
+                    const move = solution[currentStep];
+                    const cell = document.getElementById(`cell-${move.x}-${move.y}`);
+                    
+                    // Lógica para la casilla que dejamos atrás:
+                    // Le quitamos el caballo, le ponemos el número de salto y la marcamos como visitada
+                    if (currentStep > 0) {
+                        const prevMove = solution[currentStep - 1];
+                        const prevCell = document.getElementById(`cell-${prevMove.x}-${prevMove.y}`);
+                        prevCell.innerHTML = prevMove.step; 
+                        prevCell.classList.remove('knight-icon');
+                        prevCell.classList.add('visited');
+                    }
+
+                    // Lógica para la nueva casilla que pisa el caballo:
+                    // Insertamos el ícono gigante con efecto de pulso neón
+                    cell.innerHTML = "♞";
+                    cell.classList.add('knight-icon');
+
+                    currentStep++;
+                }, 250); // Velocidad de los saltos visuales (250ms)
+            }
+        }
+
+        // Event Listeners
+        startBtn.addEventListener('click', () => {
+            createBoard();
+            animateSolution();
+        });
+
+        resetBtn.addEventListener('click', () => {
+            clearInterval(animationInterval);
+            createBoard();
+            statusElement.innerText = "Esperando inicio...";
+            startBtn.disabled = false;
+        });
+
+        // Dibujamos el tablero apenas carga la página
+        createBoard();
+    </script>
+</body>
+</html>
