@@ -7,7 +7,7 @@ import sys
 
 class Conexion:
     _DATABASE = 'test_bd'
-    _USERNAME = 'ariel'
+    _USERNAME = 'postgres'
     _PASSWORD = 'admin'
     _DEB_PORT = '5432'
     _HOST = '127.0.0.1'
@@ -15,7 +15,7 @@ class Conexion:
     _cursor = None
 
     @classmethod  ##METODO OBTENER CONEXION.
-    def obtenerconexion(cls):
+    def obtenerConexion(cls):
         if cls._conexion is None:
             try:
                 cls._conexion = bd.connect(host=cls._HOST,
@@ -32,10 +32,10 @@ class Conexion:
             return cls._conexion
 
     @classmethod
-    def obtenercursor(cls):
+    def obtenerCursor(cls):
         if cls._cursor is None:
             try:
-                cls._cursor = cls.obtenerconexion().cursor()
+                cls._cursor = cls.obtenerConexion().cursor()
                 log.debug(f'Se abrió correctamente el cursor: {cls._cursor}')
                 return cls._cursor
             except Exception as e:
