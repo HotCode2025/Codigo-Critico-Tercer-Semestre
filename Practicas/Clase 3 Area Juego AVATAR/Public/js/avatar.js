@@ -1,26 +1,37 @@
-// Le digo al navegador que espere a que cargue todo el HTML antes de arrancar el juego. 
-// Así me aseguro de que todos los elementos existan cuando los vaya a buscar.
 window.addEventListener('load', iniciarJuego)
 
+// Variables globales
+let ataqueJugador
+let ataqueEnemigo
+let vidasJugador = 3
+let vidasEnemigo = 3
+
 function iniciarJuego() {
-    // Capturo el botón de seleccionar personaje que está en mi HTML
     let botonPersonajeJugador = document.getElementById('boton-personaje')
+
+    let botonPunio = document.getElementById('boton-punio') 
+    botonPunio.addEventListener('click', ataquePunio)
     
-    // Le agrego un "escuchador de eventos" para que, cuando le haga click, dispare la función de selección
+    let botonPatada = document.getElementById('boton-patada')
+    botonPatada.addEventListener('click', ataquePatada)
+    
+    let botonBarrida = document.getElementById('boton-barrida')
+    botonBarrida.addEventListener('click', ataqueBarrida)
+    
     botonPersonajeJugador.addEventListener('click', seleccionarPersonajeJugador)
+
+    let botonReiniciar = document.getElementById('boton-reiniciar')
+    botonReiniciar.addEventListener('click', reiniciarJuego)
 }
 
 function seleccionarPersonajeJugador() {
-    // Me traigo todos los inputs de los personajes desde el HTML
     let inputZuko = document.getElementById('zuko')
     let inputKatara = document.getElementById('katara')
     let inputAang = document.getElementById('aang')
     let inputToph = document.getElementById('toph')
     
-    // Acá es donde voy a inyectar el nombre del personaje que elegí para que se vea en pantalla
     let spanPersonajeJugador = document.getElementById('personaje-jugador')
 
-    // Me fijo cuál de todos los inputs está marcado (.checked)
     if (inputZuko.checked) {
         spanPersonajeJugador.innerHTML = 'Zuko'
     } else if (inputKatara.checked) {
@@ -30,33 +41,21 @@ function seleccionarPersonajeJugador() {
     } else if (inputToph.checked) {
         spanPersonajeJugador.innerHTML = 'Toph'
     } else {
-        // Si no elegí ninguno y toqué el botón, tiro una alerta para avisarme
         alert('Por favor, selecciona un personaje primero.')
-        // Uso return para cortar la ejecución acá y que no siga de largo sin personaje
         return 
     }
 
-    // Una vez que ya elegí mi personaje con éxito, llamo a la función para que la compu elija el suyo
     seleccionarPersonajeEnemigo()
 }
 
 function seleccionarPersonajeEnemigo() {
-    // Busco el lugar en el HTML donde voy a mostrar al enemigo
     let spanPersonajeEnemigo = document.getElementById('personaje-enemigo')
-    
-    // Capturo el nombre del personaje que el jugador ACABA de elegir para poder compararlo
     let nombreJugador = document.getElementById('personaje-jugador').innerHTML
-    
-    // Creo una variable vacía para guardar temporalmente el personaje de la compu
     let personajeGenerado = ''
 
-    // Uso el bucle "do...while" para que elija un personaje.
-    // Si elige el mismo que el jugador, el bucle se repite y vuelve a tirar el dado.
     do {
-        // Genero un número al azar entre el 1 y el 4 usando mi función ayudante
         let personajeAleatorio = aleatorio(1, 4)
         
-        // Dependiendo del número que tocó, le asigno un personaje a la variable temporal
         if (personajeAleatorio == 1) {
             personajeGenerado = 'Zuko'
         } else if (personajeAleatorio == 2) {
@@ -67,15 +66,113 @@ function seleccionarPersonajeEnemigo() {
             personajeGenerado = 'Toph'
         }
         
-    //  MIENTRAS el personaje de la compu sea IGUAL al del jugador, repite todo.
     } while (personajeGenerado === nombreJugador) 
 
-    // Una vez que sale del bucle, es porque encontró uno distinto. 
     spanPersonajeEnemigo.innerHTML = personajeGenerado
 }
 
-// Esta es mi función ayudante para sacar números aleatorios. 
-// Le paso un mínimo y un máximo, y hace la matemática necesaria para devolverme un número entero.
+function ataquePunio(){ 
+    ataqueJugador = 'Puño'
+    ataqueAleatorioEnemigo()
+}
+
+function ataquePatada(){ 
+    ataqueJugador = 'Patada'
+    ataqueAleatorioEnemigo()
+}
+
+function ataqueBarrida(){ 
+    ataqueJugador = 'Barrida'
+    ataqueAleatorioEnemigo()
+}
+
+function ataqueAleatorioEnemigo(){ 
+    let ataqueAleatorio = aleatorio(1, 3)
+
+    if(ataqueAleatorio == 1){
+        ataqueEnemigo = 'Puño'
+    } else if(ataqueAleatorio == 2){
+        ataqueEnemigo = 'Patada'
+    } else {
+        ataqueEnemigo = 'Barrida'
+    }
+    
+    combate()
+}
+
+function combate() {
+    let spanVidasJugador = document.getElementById('vidas-jugador')
+    let spanVidasEnemigo = document.getElementById('vidas-enemigo')
+    let resultado;
+
+    // Lógica para determinar el ganador y restar vidas
+    if (ataqueJugador == ataqueEnemigo) {
+        resultado = "EMPATE"
+    } else if (ataqueJugador == 'Puño' && ataqueEnemigo == 'Barrida') {
+        resultado = "GANASTE"
+        vidasEnemigo-- 
+        spanVidasEnemigo.innerHTML = vidasEnemigo 
+    } else if (ataqueJugador == 'Patada' && ataqueEnemigo == 'Puño') {
+        resultado = "GANASTE"
+        vidasEnemigo--
+        spanVidasEnemigo.innerHTML = vidasEnemigo
+    } else if (ataqueJugador == 'Barrida' && ataqueEnemigo == 'Patada') {
+        resultado = "GANASTE"
+        vidasEnemigo--
+        spanVidasEnemigo.innerHTML = vidasEnemigo
+    } else {
+        resultado = "PERDISTE"
+        vidasJugador-- 
+        spanVidasJugador.innerHTML = vidasJugador 
+    }
+
+    crearMensaje(resultado)
+    revisarVidas()
+}
+
+function revisarVidas() {
+    if (vidasEnemigo == 0) {
+        crearMensajeFinal("¡FELICITACIONES! Ganaste el combate 🏆")
+    } else if (vidasJugador == 0) {
+        crearMensajeFinal("Lo siento, perdiste el combate 😢")
+    }
+}
+
+function crearMensaje(resultado){
+    let sectionMensaje = document.getElementById('mensajes') 
+    let parrafo = document.createElement('p')
+
+    parrafo.innerHTML = 'Tu personaje atacó con <strong>' + ataqueJugador +  '</strong>, el personaje del enemigo atacó con <strong>' + ataqueEnemigo + '</strong> - ' + resultado
+
+    sectionMensaje.appendChild(parrafo)
+}
+
+function crearMensajeFinal(resultadoFinal) {
+    let sectionMensaje = document.getElementById('mensajes') 
+    let parrafo = document.createElement('p')
+    
+    parrafo.innerHTML = '<strong>' + resultadoFinal + '</strong>'
+    parrafo.style.backgroundColor = "#fff3cd"
+    parrafo.style.color = "#856404"
+    parrafo.style.textAlign = "center"
+    parrafo.style.fontSize = "1.2rem"
+
+    sectionMensaje.appendChild(parrafo)
+
+    // Bloqueamos los botones de ataque
+    let botonPunio = document.getElementById('boton-punio') 
+    let botonPatada = document.getElementById('boton-patada')
+    let botonBarrida = document.getElementById('boton-barrida')
+    
+    botonPunio.disabled = true
+    botonPatada.disabled = true
+    botonBarrida.disabled = true
+}
+
 function aleatorio(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min) 
+}
+
+function reiniciarJuego() {
+    location.reload()
 }

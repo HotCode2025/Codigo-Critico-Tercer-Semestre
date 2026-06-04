@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
   <head>
     <meta charset="utf-8" />
     <title>LA LEYENDA DE AANG: AVATAR</title>
@@ -7,7 +7,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-      /* Estilos generales para el cuerpo de la página: tipografía, color de fondo y centro todo para que se vea prolijo */
+      /* Estilos generales */
       body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background-color: #f8f9fa;
@@ -17,7 +17,6 @@
         margin: 0 auto;
       }
 
-      /* Alineo el título principal y le doy un poco de espacio entre el texto y los iconos usando Flexbox */
       h1 {
         display: flex;
         align-items: center;
@@ -25,12 +24,10 @@
         color: #2c3e50;
       }
 
-      /* Aumento el tamaño de los iconos que están adentro del título (h1) */
       h1 i {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
       }
 
-      /* A cada sección de mi juego la convierto en una "tarjeta" blanca con bordes redondeados y una sombrita */
       section {
         background: white;
         padding: 20px;
@@ -39,59 +36,124 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
       }
 
-      /* Agrupo los botones de ataque para que queden uno al lado del otro, y si no entran, bajen de línea (wrap) */
+      /* Estilos para la sección de reglas */
+      .seccion-reglas {
+        background-color: #eef2f5; 
+      }
+
+      details summary {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #2c3e50;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        list-style: none; 
+      }
+
+      details summary::-webkit-details-marker {
+        display: none; 
+      }
+
+      details summary:hover {
+        color: #1e90ff;
+      }
+
+      .contenido-reglas {
+        margin-top: 15px;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #444;
+      }
+
+      /* CORRECCIÓN: Separamos los estilos de la lista principal (ol) y la secundaria (ul) */
+      .contenido-reglas ol > li {
+        margin-bottom: 12px;
+      }
+
+      .contenido-reglas ul {
+        list-style-type: none; 
+        padding-left: 0;
+        margin-top: 10px;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+      }
+
+      .contenido-reglas ul li {
+        margin-bottom: 8px;
+        display: flex; /* Ahora el flex solo afecta a las reglas con íconos */
+        align-items: center;
+        flex-wrap: wrap; /* Por si el texto es largo en celulares */
+        gap: 5px;
+      }
+      /* ------------------------------------------------------------------------- */
+
+      /* Estilos de botones (Efecto 3D y diseño moderno) */
       .contenedor-botones {
         display: flex;
-        gap: 10px;
+        gap: 15px; 
         flex-wrap: wrap;
         margin-top: 15px;
       }
 
-      /* Le doy estilo base a todos mis botones: saco los bordes feos por defecto, les pongo relleno y hago que se achiquen un poquito al hacer click (.active) */
       button {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 18px;
+        padding: 12px 20px;
         border: none;
         border-radius: 8px;
-        font-weight: 600;
-        font-size: 0.95rem;
+        font-weight: 700; 
+        font-size: 1rem;
         cursor: pointer;
-        transition: transform 0.2s, background-color 0.2s;
+        transition: transform 0.1s, background-color 0.2s, box-shadow 0.1s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        border-bottom: 4px solid rgba(0,0,0,0.15); 
+      }
+
+      button i {
+        font-size: 1.4rem; 
       }
 
       button:active {
-        transform: scale(0.95);
+        transform: translateY(3px); 
+        border-bottom: 1px solid rgba(0,0,0,0.15);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
       }
 
-      /* Estilo oscuro para el botón de confirmar el personaje */
-      #boton-personaje {
-        background-color: #2c3e50;
-        color: white;
-        margin-left: 15px;
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
       }
 
-      /* Acá personalizo cada botón de ataque con su color de elemento correspondiente. Le agrego un efecto :hover para que cambie de color cuando le paso el mouse por arriba */
-      #boton-fuego { background-color: #ffebee; color: #c62828; }
+      #boton-personaje { background-color: #2c3e50; color: white; margin-left: 15px; }
+      
+      #boton-fuego { background-color: #ffebee; color: #c62828; border-bottom-color: #ef9a9a;}
       #boton-fuego:hover { background-color: #ffcdd2; }
-
-      #boton-agua { background-color: #e3f2fd; color: #1565c0; }
+      
+      #boton-agua { background-color: #e3f2fd; color: #1565c0; border-bottom-color: #90caf9;}
       #boton-agua:hover { background-color: #bbdefb; }
-
-      #boton-tierra { background-color: #e8f5e9; color: #2e7d32; }
+      
+      #boton-tierra { background-color: #e8f5e9; color: #2e7d32; border-bottom-color: #a5d6a7;}
       #boton-tierra:hover { background-color: #c8e6c9; }
+      
+      #boton-reiniciar { background-color: #37474f; color: white; border-bottom-color: #263238;}
 
-      #boton-aire { background-color: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }
-      #boton-aire:hover { background-color: #e0e0e0; }
-
-      /* El botón de reiniciar al final, también oscurito para que resalte */
-      #boton-reiniciar { background-color: #37474f; color: white; }
-
-      /* Resalto los nombres de los personajes y las vidas poniéndolos en negrita */
       span {
         font-weight: bold;
         color: #2c3e50;
+      }
+      
+      #mensajes p {
+        margin: 8px 0;
+        padding: 8px;
+        background-color: #f1f3f5;
+        border-radius: 6px;
+        border-left: 4px solid #ced4da;
       }
     </style>
   </head>
@@ -99,12 +161,31 @@
 
     <h1>
       AVATAR 
-      <i class="ph-duotone ph-fire" style="color: #ff4500;"></i> 
-      <i class="ph-duotone ph-drop" style="color: #1e90ff;"></i> 
-      <i class="ph-duotone ph-plant" style="color: #228b22;"></i> 
-      <i class="ph-duotone ph-wind" style="color: #a9a9a9;"></i>
+      <i class="ph-fill ph-fire" style="color: #ff4500;"></i> 
+      <i class="ph-fill ph-drop" style="color: #1e90ff;"></i> 
+      <i class="ph-fill ph-mountains" style="color: #2e7d32;"></i> 
+      <i class="ph-fill ph-wind" style="color: #a9a9a9;"></i>
     </h1>
     
+    <section id="reglas-juego" class="seccion-reglas">
+        <details>
+            <summary><i class="ph-fill ph-info"></i> ¿Cómo jugar? (Reglas)</summary>
+            <div class="contenido-reglas">
+                <ol>
+                    <li><strong>Selecciona un personaje:</strong> Es el primer paso obligatorio.</li>
+                    <li><strong>Vidas:</strong> Tanto vos como tu enemigo (la PC) comienzan con <strong>3 vidas</strong> cada uno.</li>
+                    <li><strong>Mecánica de combate:</strong>
+                        <ul>
+                            <li>La <strong>Patada</strong> <i class="ph-fill ph-sneaker" style="color: #1e90ff;"></i> vence al <strong>Puño</strong> <i class="ph-fill ph-hand-fist" style="color: #ff4500;"></i></li>
+                            <li>El <strong>Puño</strong> <i class="ph-fill ph-hand-fist" style="color: #ff4500;"></i> vence a la <strong>Barrida</strong> <i class="ph-fill ph-boot" style="color: #2e7d32;"></i></li>
+                            <li>La <strong>Barrida</strong> <i class="ph-fill ph-boot" style="color: #2e7d32;"></i> vence a la <strong>Patada</strong> <i class="ph-fill ph-sneaker" style="color: #1e90ff;"></i></li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </details>
+    </section>
+
     <section id="seleccionar-personaje">
         <h2>Elige tu Personaje</h2>
         
@@ -125,23 +206,20 @@
 
     <section id="seleccionar-ataque">
       <h2>Elige tu ataque</h2>
-      <p>Tu personaje <span id="personaje-jugador">-</span> tiene <span>3</span> vidas</p>
-      <p>El personaje <span id="personaje-enemigo">-</span> del enemigo tiene <span>3</span> vidas</p>
+      <p>Tu personaje <span id="personaje-jugador">-</span> tiene <span id="vidas-jugador">3</span> vidas</p>
+      <p>El personaje <span id="personaje-enemigo">-</span> del enemigo tiene <span id="vidas-enemigo">3</span> vidas</p>
       
         <div class="contenedor-botones">
-            <button id="boton-fuego">Fuego <i class="ph-duotone ph-fire"></i></button>
-            <button id="boton-agua">Agua <i class="ph-duotone ph-drop"></i></button>
-            <button id="boton-tierra">Tierra <i class="ph-duotone ph-plant"></i></button>
-            <button id="boton-aire">Aire <i class="ph-duotone ph-wind"></i></button>
+            <button id="boton-punio">Puño <i class="ph-fill ph-hand-fist"></i></button>
+            <button id="boton-patada">Patada <i class="ph-fill ph-sneaker"></i></button>
+            <button id="boton-barrida">Barrida <i class="ph-fill ph-boot"></i></button>
         </div>
     </section>
 
-    <section id="mensajes">
-        <p>Tu personaje atacó con todo el poder del FUEGO, el personaje del enemigo atacó con el medio poder de la TIERRA - GANASTE </p>
-    </section>
+    <section id="mensajes"></section>
 
     <section id="reiniciar">
-        <button id="boton-reiniciar">Reiniciar</button>
+        <button id="boton-reiniciar">Reiniciar <i class="ph-bold ph-arrows-clockwise"></i></button>
     </section>
 
     <script src="./js/avatar.js"></script>
