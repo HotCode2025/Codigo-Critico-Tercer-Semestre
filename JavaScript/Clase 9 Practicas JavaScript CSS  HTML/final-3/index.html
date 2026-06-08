@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <meta name="description" content="Formulario de Login con efecto Glassmorphism - Web Viva" />
+    <meta name="author" content="Juan Ariel Mazara" />
+    
+    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+    
+    <link rel="stylesheet" href="./css/style.css">
+    
+    <title>Web Viva</title>
+</head>
+<body>
+
+    <section>
+        
+        <div class="color"></div>
+        <div class="color"></div>
+        <div class="color"></div>
+
+        <div class="box">
+            
+            <div class="square" style="--i:0;"></div> <div class="square" style="--i:1;"></div> <div class="square" style="--i:2;"></div> <div class="square" style="--i:3;"></div> <div class="container">
+                <div class="form">
+                    <h2>Login Form</h2>
+                    
+                    <form>
+                        <div class="inputBox">
+                            <input type="text" placeholder="Username" required>
+                        </div>
+                        
+                        <div class="inputBox">
+                            <input type="password" placeholder="Password" required>
+                        </div>
+                        
+                        <div class="inputBox">
+                            <input type="submit" value="Login" />
+                        </div>
+                        
+                        <p class="forget">Forgot password? 
+                            <a href="#">Click Here</a>
+                        </p>
+                        
+                        <p class="forget">Don't have an account? 
+                            <a href="#">Sign Up</a>
+                        </p>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+   <script src="codigo.js"></script>
+
+</body>
+</html>
+
+/*Para lograr que aparezcan y se muevan los 4 cuadrados, necesitamos hacer dos tareas:
+    1. En el HTML: Agregar los 3 divs faltantes dentro de la caja .box, asignándole a cada uno un número diferente en la variable --i (esto hará que sus animaciones vayan a destiempo y no se muevan todos en bloque de manera idéntica).
+    2. En el CSS: Definir la posición (top, bottom, left, right) y el tamaño (width, height) para cada uno de los 4 cuadrados usando :nth-child(1), :nth-child(2) */

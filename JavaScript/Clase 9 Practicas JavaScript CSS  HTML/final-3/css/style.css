@@ -1,0 +1,237 @@
+/* Importación de la fuente tipográfica Poppins desde los servidores de Google Fonts */
+@import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+
+/* REGLAS GLOBALES (Reset de estilos) */
+* {
+    font-family: 'Poppins', sans-serif; /* Aplica la fuente a todo el documento */
+    margin: 0;                          /* Elimina márgenes residuales del navegador */
+    padding: 0;                         /* Elimina paddings por defecto */
+    box-sizing: border-box;             /* Asegura que el padding/borde no altere el tamaño fijado de las cajas */
+}
+
+/* Configuración del cuerpo de la página */
+body {
+    overflow: hidden; /* Oculta cualquier desborde para evitar barras de navegación causadas por el blur */
+}
+
+/* LIENZO GENERAL (Fondo y alineación) */
+section {
+    display: flex;             /* Activamos Flexbox para control de coordenadas */
+    justify-content: center;   /* Centra todo el contenido de forma horizontal */
+    align-items: center;       /* Centra todo el contenido de forma vertical */
+    min-height: 100vh;         /* Obliga a la sección a medir el 100% del alto de la pantalla */
+    background: linear-gradient(to bottom, #f1f4f9, #dff1ff); /* Degradado suave de fondo */
+}
+
+/* ESFERAS LUMÍNICAS DE FONDO */
+section .color {
+    position: absolute;       /* Permite moverlas libremente por la pantalla de forma independiente */
+    filter: blur(150px);      /* Propiedad clave: difumina los bordes rígidos creando un efecto nube/aura */
+}
+
+/* Esfera 1: Rosa (Esquina superior) */
+section .color:nth-child(1) {
+    top: -350px;
+    width: 600px; 
+    height: 600px;
+    background: #ff359b;
+}
+
+/* Esfera 2: Amarilla (Esquina inferior izquierda) */
+section .color:nth-child(2) {
+    bottom: -150px; 
+    left: 100px; 
+    width: 500px; 
+    height: 500px;
+    background: #fffd87;
+}
+
+/* Esfera 3: Celeste (Esquina inferior derecha) */
+section .color:nth-child(3) {
+    bottom: 50px; 
+    right: 100px; 
+    width: 300px; 
+    height: 300px;
+    background: #00d2ff;
+}
+
+/* CONTENEDOR RELATIVO (Agrupador del formulario y los cuadrados) */
+.box {
+    position: relative;
+}
+
+/* PROPIEDADES BASE PARA LOS 4 CUADRADOS FLOTANTES */
+.box .square {
+    position: absolute;        /* Posicionamiento libre respecto a la caja .box */
+    backdrop-filter: blur(5px);/* Genera el efecto de vidrio esmerilado sobre lo que tenga atrás */
+    box-shadow: 0 25px 45px rgba(0,0,0,0.1); /* Sombra suave para dar sensación de relieve/3D */
+    border: 1px solid rgba(255,255,255,0.2);       /* Borde superior e izquierdo blanco translúcido */
+    border-right: 1px solid rgba(255,255,255,0.2); /* Sellar bordes con transparencia */
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);            /* Fondo blanco con 10% de opacidad */
+    border-radius: 10px;                          /* Bordes redondeados sutiles */
+    
+    /* Configuración de la animación: ejecuta el keyframe 'animate', dura 10s, suavizado y en bucle */
+    animation: animate 10s ease-in-out infinite;
+    
+    /* Cómputo matemático: multiplica el valor de '--i' por -1.5s para desfasar el inicio de la animación */
+    animation-delay: calc(-1.5s * var(--i));
+}
+
+/* DISTRIBUCIÓN INDIVIDUAL DE LOS CUADRADOS (Tamaños y Coordenadas) */
+
+/* Cuadrado 1: Mediano (Arriba a la derecha) */
+.box .square:nth-child(1) {
+    top: -50px;
+    right: -60px;
+    width: 100px;
+    height: 100px;
+}
+
+/* Cuadrado 2: Chico (Arriba al centro / izquierda) */
+.box .square:nth-child(2) {
+    top: -100px;
+    left: 50px;
+    width: 60px;
+    height: 60px;
+    z-index: 2; /* Mayor prioridad de capa: pasa por delante del contenedor */
+}
+
+/* Cuadrado 3: Mediano/Chico (Abajo a la derecha) */
+.box .square:nth-child(3) {
+    bottom: 50px;
+    right: -60px;
+    width: 80px;
+    height: 80px;
+}
+
+/* Cuadrado 4: Grande (Abajo a la izquierda) */
+.box .square:nth-child(4) {
+    bottom: -80px;
+    left: -100px;
+    width: 120px;
+    height: 120px;
+}
+
+/* LÓGICA DE LA ANIMACIÓN (Movimiento vertical continuo) */
+@keyframes animate {
+    0%, 100% {
+        transform: translateY(-40px); /* Inicia y termina arriba */
+    }
+    50% {
+        transform: translateY(40px);  /* En la mitad del tiempo baja 40px */
+    }
+}
+
+/* TARJETA CONTENEDORA DEL LOGIN (Efecto Vidrio Principal) */
+.container {
+    position: relative;
+    width: 400px;
+    min-height: 400px;
+    background: rgba(255,255,255,0.1); /* Cristal translúcido */
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);         /* Difumina el fondo de color de la section */
+    box-shadow: 0 25px 45px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-right: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    z-index: 1; /* Asegura que la tarjeta se mantenga accesible al cursor por sobre el fondo */
+}
+
+/* Caja de separación interna del formulario */
+.form {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 40px; /* Margen interno para que nada toque los bordes del cristal */
+}
+
+/* Estilos del título h2 ("Login Form") */
+.form h2 {
+    position: relative;
+    color: #fff;       /* Texto blanco puro */
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 40px;
+}
+
+/* Línea decorativa blanca debajo del título h2 */
+.form h2::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    width: 80px;
+    height: 4px;
+    background: #fff;
+}
+
+/* Contenedores individuales de cada input */
+.form .inputBox {
+    width: 100%;
+    margin-top: 20px; /* Separación vertical entre campos */
+}
+
+/* CONFIGURACIÓN DE LOS ENTRADAS DE TEXTO (Inputs) */
+.form .inputBox input {
+    width: 100%;
+    background: rgba(255,255,255,0.2); /* Fondo del campo semi-transparente */
+    border: none;
+    outline: none;
+    padding: 10px 20px;
+    border-radius: 35px; /* Formato ovalado */
+    border-right: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: #333; /* Optimizado: Gris oscuro para que se lee perfectamente lo que se escribe */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: 0.3s; /* Suaviza transiciones visuales */
+}
+
+/* Estilo del texto instructivo dentro de los inputs (Placeholder) */
+.form .inputBox input::placeholder {
+    color: #666; /* Optimizado: Tono intermedio para una legibilidad clara */
+}
+
+/* CONFIGURACIÓN ESPECÍFICA DEL BOTÓN ENVIAR (Submit) */
+.form .inputBox input[type="submit"] {
+    background: #fff;     /* Fondo blanco plano al inicio */
+    color: #666;          /* Texto gris */
+    max-width: 100px;     /* Acota el ancho máximo del botón */
+    cursor: pointer;      /* Cambia el cursor a modo mano al posicionarse encima */
+    margin-bottom: 20px;
+    font-weight: 600;
+    transition: 0.3s ease-in-out; /* Controla la velocidad de cambio al hacer hover */
+}
+
+/* EFECTO INTERACTIVO AL PASAR EL MOUSE POR EL BOTÓN LOGIN */
+.form .inputBox input[type="submit"]:hover {
+    background: #ff359b; /* El botón pasa al color rosa del fondo */
+    color: #fff;         /* El texto cambia a blanco */
+    box-shadow: 0 5px 15px rgba(255, 53, 155, 0.4); /* Proyecta un brillo rosa de fondo */
+}
+
+/* TEXTOS DE ENLACE INFERIORES */
+.forget {
+    margin-top: 12px;
+    color: #444; /* Optimizado: Gris oscuro con buen contraste sobre el cristal claro */
+    font-size: 14px;
+}
+
+/* Estilos para las etiquetas de anclajes (Links) de registro/recuperación */
+.forget a {
+    color: #ff359b;      /* Color rosa para llamar la atención del usuario */
+    font-weight: 600;
+    text-decoration: none; /* Elimina la línea de subrayado inicial */
+    transition: 0.2s;
+}
+
+/* Subrayado clásico cuando el usuario pasa el mouse sobre el enlace */
+.forget a:hover {
+    text-decoration: underline;
+}
