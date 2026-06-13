@@ -26,7 +26,12 @@ class PersonaDAO:
             registros = cursor.fetchall()
             personas = []
             for registro in registros:
-                persona = Persona(registro[0], registro[1], registro[2], registro[3])
+                persona = Persona(
+                    id_persona=registro[0],
+                    nombre=registro[1],
+                    apellido=registro[2],
+                    email=registro[3]
+                )
                 personas.append(persona)
             return personas
 
@@ -56,19 +61,19 @@ class PersonaDAO:
 
 if __name__ == '__main__':
     #Eliminar un registro
-    #persona1 = Persona(id_persona=5)
-    #persona_eliminadas = PersonaDAO.eliminar(persona1)
-    #log.debug(f'Personas eliminadas: {persona_eliminadas}')
+    persona1 = Persona(id_persona=18)
+    persona_eliminadas = PersonaDAO.eliminar(persona1)
+    log.debug(f'Personas eliminadas: {persona_eliminadas}')
 
     # Actualizar un registro
-    #persona1 = Persona(1, 'Juan José', 'Pena', 'jjpena@mail.com')
-    #personas_actualizadas = PersonaDAO.actualizar(persona1)
-    #log.debug(f'Personas actualizadas: {personas_actualizadas}')
+    persona1 = Persona(1, 'Juan', 'Pena', 'jpena@mail.com')
+    personas_actualizadas = PersonaDAO.actualizar(persona1)
+    log.debug(f'Personas actualizadas: {personas_actualizadas}')
 
     # Insertar un registro
-    #persona1 = Persona(nombre='Omero', apellido='Ramos', email='omeror@gmail.com')
-    #personas_insertadas = PersonaDAO.insertar(persona1)
-    #log.debug(f'Personas insertadas: {personas_insertadas}')
+    persona1 = Persona(nombre='Mateo', apellido='Torres', email='tmateo@gmail.com')
+    personas_insertadas = PersonaDAO.insertar(persona1)
+    log.debug(f'Personas insertadas: {personas_insertadas}')
 
     # Seleccionar objetos
     personas = PersonaDAO.seleccionar()

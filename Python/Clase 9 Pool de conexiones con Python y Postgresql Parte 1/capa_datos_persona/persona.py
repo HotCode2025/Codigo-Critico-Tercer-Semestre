@@ -1,5 +1,6 @@
 from logger_base import log
 
+
 class Persona:
     def __init__(self, id_persona=None, nombre=None, apellido=None, email=None):
         self._id_persona = id_persona
@@ -15,7 +16,7 @@ class Persona:
             Email: {self._email}
         '''
 
-    #Metodos Getters and Setters
+    # Metodos Getters and Setters
     @property
     def id_persona(self):
         return self._id_persona
@@ -44,15 +45,18 @@ class Persona:
     def email(self):
         return self._email
 
+    # CORRECCIÓN: Se cambió el nombre de la función de 'apellido' a 'email'
     @email.setter
-    def apellido(self, email):
+    def email(self, email):
         self._email = email
 
 
 if __name__ == '__main__':
     persona1 = Persona(1, 'Juan', 'Perez', 'jperez@gmail.com')
     log.debug(persona1)
+
     persona2 = Persona(nombre='Jose', apellido='Lepez', email='ljose@gmail.com')
     log.debug(persona2)
-    persona1 = Persona(id_persona = 1)
+
+    persona1 = Persona(id_persona=1)
     log.debug(persona1)
