@@ -1,227 +1,461 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
+<head>
     <meta charset="utf-8" />
-    <title>LA LEYENDA DE AANG: AVATAR</title>
+    <title>AVATAR: MAESTROS ELEMENTALES</title>
     
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Garamond:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-      /* Estilos generales */
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f8f9fa;
-        color: #333;
-        padding: 20px;
-        max-width: 600px;
-        margin: 0 auto;
-      }
+        /* --- ESTILOS GENERALES Y FONDO --- */
+        body {
+            font-family: 'Garamond', serif; /* Fuente similar a la imagen */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* Reemplaza con la ruta a tu imagen de pergamino/mapa */
+            background-image: url('assets/background.jpg'); 
+            background-size: cover;
+            background-position: center;
+            color: #d8b4a0; /* Color de texto suave */
+        }
 
-      h1 {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #2c3e50;
-      }
+        #game-container {
+            width: 1280px; /* Ancho fijo para recrear el diseño exacto */
+            height: 720px;
+            position: relative;
+            box-sizing: border-box;
+        }
 
-      h1 i {
-        font-size: 1.8rem;
-      }
+        /* --- HEADER Y BOTONES SUPERIORES --- */
+        #game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+        }
 
-      section {
-        background: white;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      }
+        #title-container {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-      /* Estilos para la sección de reglas */
-      .seccion-reglas {
-        background-color: #eef2f5; 
-      }
+        h1#game-title {
+            margin: 0;
+            font-size: 3rem;
+            color: #dcdde1;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            /* Reemplaza con la ruta a tu imagen de banner de roca */
+            background-image: url('assets/title_banner.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            padding: 15px 50px;
+        }
 
-      details summary {
-        font-weight: bold;
-        font-size: 1.1rem;
-        color: #2c3e50;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        list-style: none; 
-      }
+        #elemental-symbols {
+            display: flex;
+            gap: 10px;
+            margin-top: -10px;
+        }
 
-      details summary::-webkit-details-marker {
-        display: none; 
-      }
+        #elemental-symbols i {
+            font-size: 1.5rem;
+            opacity: 0.8;
+        }
 
-      details summary:hover {
-        color: #1e90ff;
-      }
+        #rules-btn, #restart-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            width: 150px;
+            height: 50px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            color: #dcdde1;
+            font-family: 'Garamond', serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            transition: transform 0.1s;
+        }
 
-      .contenido-reglas {
-        margin-top: 15px;
-        font-size: 0.95rem;
-        line-height: 1.6;
-        color: #444;
-      }
+        #rules-btn { background-image: url('assets/rules_btn.png'); }
+        #restart-btn { background-image: url('assets/restart_btn.png'); }
 
-      /* CORRECCIÓN: Separamos los estilos de la lista principal (ol) y la secundaria (ul) */
-      .contenido-reglas ol > li {
-        margin-bottom: 12px;
-      }
+        #rules-btn:active, #restart-btn:active { transform: translateY(2px); }
 
-      .contenido-reglas ul {
-        list-style-type: none; 
-        padding-left: 0;
-        margin-top: 10px;
-        background: white;
-        padding: 10px;
-        border-radius: 8px;
-      }
+        /* --- ZONA DE BATALLA PRINCIPAL (Mapa) --- */
+        #battle-stage {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            gap: 20px;
+            padding: 120px 40px 100px; /* Ajuste para el header */
+            height: 100%;
+            box-sizing: border-box;
+        }
 
-      .contenido-reglas ul li {
-        margin-bottom: 8px;
-        display: flex; /* Ahora el flex solo afecta a las reglas con íconos */
-        align-items: center;
-        flex-wrap: wrap; /* Por si el texto es largo en celulares */
-        gap: 5px;
-      }
-      /* ------------------------------------------------------------------------- */
+        /* --- CARTAS DE PERSONAJE --- */
+        .character-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-      /* Estilos de botones (Efecto 3D y diseño moderno) */
-      .contenedor-botones {
-        display: flex;
-        gap: 15px; 
-        flex-wrap: wrap;
-        margin-top: 15px;
-      }
+        .label {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #dcdde1;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
 
-      button {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        font-weight: 700; 
-        font-size: 1rem;
-        cursor: pointer;
-        transition: transform 0.1s, background-color 0.2s, box-shadow 0.1s;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        border-bottom: 4px solid rgba(0,0,0,0.15); 
-      }
+        .card-frame {
+            width: 300px;
+            height: 420px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
 
-      button i {
-        font-size: 1.4rem; 
-      }
+        /* Marcos de color azul y rojo luminoso */
+        #player-card .card-frame { 
+            background-image: url('assets/player_card_frame.png'); 
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.7); /* Brillo azul */
+        }
+        #enemy-card .card-frame { 
+            background-image: url('assets/enemy_card_frame.png'); 
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.7); /* Brillo rojo */
+        }
 
-      button:active {
-        transform: translateY(3px); 
-        border-bottom: 1px solid rgba(0,0,0,0.15);
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      }
+        .card-image-container {
+            flex: 1;
+            background-size: cover;
+            background-position: center;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            /* Placeholder para cuando no hay personaje seleccionado */
+            background-color: #333; 
+        }
 
-      button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        transform: none;
-        box-shadow: none;
-      }
+        .card-info {
+            padding: 15px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
 
-      #boton-personaje { background-color: #2c3e50; color: white; margin-left: 15px; }
-      
-      #boton-fuego { background-color: #ffebee; color: #c62828; border-bottom-color: #ef9a9a;}
-      #boton-fuego:hover { background-color: #ffcdd2; }
-      
-      #boton-agua { background-color: #e3f2fd; color: #1565c0; border-bottom-color: #90caf9;}
-      #boton-agua:hover { background-color: #bbdefb; }
-      
-      #boton-tierra { background-color: #e8f5e9; color: #2e7d32; border-bottom-color: #a5d6a7;}
-      #boton-tierra:hover { background-color: #c8e6c9; }
-      
-      #boton-reiniciar { background-color: #37474f; color: white; border-bottom-color: #263238;}
+        #personaje-jugador, #personaje-enemigo {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #f1f3f5;
+            margin-bottom: 5px;
+        }
 
-      span {
-        font-weight: bold;
-        color: #2c3e50;
-      }
-      
-      #mensajes p {
-        margin: 8px 0;
-        padding: 8px;
-        background-color: #f1f3f5;
-        border-radius: 6px;
-        border-left: 4px solid #ced4da;
-      }
+        /* --- BARRA DE VIDA --- */
+        .health-bar {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .heart {
+            width: 40px;
+            height: 40px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        #vidas-jugador .heart { background-image: url('assets/blue_heart.png'); }
+        #vidas-enemigo .heart { background-image: url('assets/red_heart.png'); }
+
+        .vidas-text {
+            color: #dcdde1;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none; /* Ocultar el texto por defecto, ya que los corazones lo muestran */
+        }
+        #enemy-side .vidas-text { display: block; } /* Mostrar solo en el enemigo como en la imagen */
+
+        /* --- PANEL DE INSTRUCCIONES DEL JUGADOR --- */
+        #turn-instructions {
+            background: rgba(0,0,0,0.6);
+            padding: 10px;
+            border-radius: 8px;
+            color: #dcdde1;
+            text-align: center;
+            margin-top: 20px;
+            width: 80%;
+            display: none; /* Se mostrará con JS cuando el personaje esté elegido */
+        }
+        #turn-instructions strong { color: #f1f3f5; }
+
+        /* --- PANEL CENTRAL: HISTORIAL DE BATALLA --- */
+        #center-panel {
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 20px;
+            color: #dcdde1;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #center-panel h3 {
+            margin-top: 0;
+            text-align: center;
+            color: #f1f3f5;
+            text-transform: uppercase;
+        }
+
+        #battle-history {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        #battle-history p {
+            margin: 5px 0;
+            color: #d8b4a0;
+        }
+
+        /* --- FASE DE ACCIÓN: CARTAS ABAJO --- */
+        #action-phase {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        #action-cards-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .action-card {
+            width: 180px;
+            height: 250px;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-image: url('assets/action_card_frame.png');
+            border: none;
+            cursor: pointer;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            padding: 0;
+            text-align: center;
+        }
+
+        .action-card:hover { transform: translateY(-10px); }
+        .action-card:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .action-card .card-icon-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .action-card .action-icon {
+            width: 80px;
+            height: 80px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .action-card h4 {
+            margin: 10px 0;
+            font-size: 1.3rem;
+            color: #f1f3f5;
+            text-transform: uppercase;
+        }
+
+        .action-card .action-description {
+            font-size: 0.9rem;
+            color: #dcdde1;
+            padding: 0 10px 10px;
+        }
+
+        /* Iconos de acción */
+        #boton-punio .action-icon { background-image: url('assets/puno_icon.png'); }
+        #boton-patada .action-icon { background-image: url('assets/patada_icon.png'); }
+        #boton-barrida .action-icon { background-image: url('assets/barrida_icon.png'); }
+
+        /* --- RESPONSIVE BÁSICO (Para que se vea mejor en pantallas pequeñas) --- */
+        @media (max-width: 1300px) {
+            #game-container {
+                width: 100vw;
+                height: 56.25vw; /* Mantener la relación de aspecto 16:9 */
+            }
+            #action-cards-row { gap: 10px; }
+            .action-card { width: 14vw; height: 20vw; }
+            .card-frame { width: 23vw; height: 32vw; }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
-    <h1>
-      AVATAR 
-      <i class="ph-fill ph-fire" style="color: #ff4500;"></i> 
-      <i class="ph-fill ph-drop" style="color: #1e90ff;"></i> 
-      <i class="ph-fill ph-mountains" style="color: #2e7d32;"></i> 
-      <i class="ph-fill ph-wind" style="color: #a9a9a9;"></i>
-    </h1>
-    
-    <section id="reglas-juego" class="seccion-reglas">
-        <details>
-            <summary><i class="ph-fill ph-info"></i> ¿Cómo jugar? (Reglas)</summary>
-            <div class="contenido-reglas">
-                <ol>
-                    <li><strong>Selecciona un personaje:</strong> Es el primer paso obligatorio.</li>
-                    <li><strong>Vidas:</strong> Tanto vos como tu enemigo (la PC) comienzan con <strong>3 vidas</strong> cada uno.</li>
-                    <li><strong>Mecánica de combate:</strong>
-                        <ul>
-                            <li>La <strong>Patada</strong> <i class="ph-fill ph-sneaker" style="color: #1e90ff;"></i> vence al <strong>Puño</strong> <i class="ph-fill ph-hand-fist" style="color: #ff4500;"></i></li>
-                            <li>El <strong>Puño</strong> <i class="ph-fill ph-hand-fist" style="color: #ff4500;"></i> vence a la <strong>Barrida</strong> <i class="ph-fill ph-boot" style="color: #2e7d32;"></i></li>
-                            <li>La <strong>Barrida</strong> <i class="ph-fill ph-boot" style="color: #2e7d32;"></i> vence a la <strong>Patada</strong> <i class="ph-fill ph-sneaker" style="color: #1e90ff;"></i></li>
-                        </ul>
-                    </li>
-                </ol>
+    <div id="game-container">
+
+        <header id="game-header">
+            <button id="rules-btn">Reglas</button>
+            <div id="title-container">
+                <h1 id="game-title">AVATAR</h1>
+                <div id="elemental-symbols">
+                    <i class="ph-fill ph-fire" style="color: #ff4500;"></i> 
+                    <i class="ph-fill ph-drop" style="color: #1e90ff;"></i> 
+                    <i class="ph-fill ph-mountains" style="color: #2e7d32;"></i> 
+                    <i class="ph-fill ph-wind" style="color: #dcdde1;"></i>
+                </div>
+                <h2 style="color: #dcdde1; margin-top: 5px; text-transform: uppercase; font-size: 1.1rem;">Maestros Elementales</h2>
             </div>
-        </details>
-    </section>
+            <button id="restart-btn" onclick="location.reload()">Reiniciar</button>
+        </header>
 
-    <section id="seleccionar-personaje">
-        <h2>Elige tu Personaje</h2>
-        
-        <input type="radio" name="personaje" id="zuko"/>
-        <label for="zuko">Zuko</label>
+        <div id="battle-stage">
 
-        <input type="radio" name="personaje" id="katara"/>
-        <label for="katara">Katara</label>
+            <section id="player-side" class="character-card">
+                <p class="label">Player</p>
+                <div class="card-frame">
+                    <div id="player-card-image" class="card-image-container">
+                        </div>
+                    <div class="card-info">
+                        <span id="personaje-jugador">-</span>
+                        <p style="color: #dcdde1; font-size: 0.9rem; margin-top: 2px;">Maestro Elemental</p>
+                    </div>
+                </div>
+                <div id="vidas-jugador" class="health-bar">
+                    <div class="heart">3</div>
+                    <div class="heart">3</div>
+                    <div class="heart">3</div>
+                </div>
+                <div id="turn-instructions">Tu Turno: <strong>Juega una Carta de Acción</strong></div>
+            </section>
 
-        <input type="radio" name="personaje" id="aang"/>
-        <label for="aang">Aang</label> 
+            <section id="center-panel">
+                <h3>Historial de Batalla</h3>
+                <div id="battle-history">
+                    </div>
+                <div id="mensajes" style="display: none;"></div>
+            </section>
 
-        <input type="radio" name="personaje" id="toph"/>
-        <label for="toph">Toph</label>
+            <section id="enemy-side" class="character-card">
+                <p class="label">Enemy</p>
+                <div class="card-frame">
+                    <div id="enemy-card-image" class="card-image-container">
+                        </div>
+                    <div class="card-info">
+                        <span id="personaje-enemigo">-</span>
+                        <p style="color: #dcdde1; font-size: 0.9rem; margin-top: 2px;">Adversario</p>
+                    </div>
+                </div>
+                <div id="vidas-enemigo" class="health-bar">
+                    <div class="heart">3</div>
+                    <div class="heart">3</div>
+                    <div class="heart">3</div>
+                </div>
+                <p class="vidas-text">3 Vidas</p>
+            </section>
 
-        <button id="boton-personaje">Seleccionar</button>
-    </section>
-
-    <section id="seleccionar-ataque">
-      <h2>Elige tu ataque</h2>
-      <p>Tu personaje <span id="personaje-jugador">-</span> tiene <span id="vidas-jugador">3</span> vidas</p>
-      <p>El personaje <span id="personaje-enemigo">-</span> del enemigo tiene <span id="vidas-enemigo">3</span> vidas</p>
-      
-        <div class="contenedor-botones">
-            <button id="boton-punio">Puño <i class="ph-fill ph-hand-fist"></i></button>
-            <button id="boton-patada">Patada <i class="ph-fill ph-sneaker"></i></button>
-            <button id="boton-barrida">Barrida <i class="ph-fill ph-boot"></i></button>
         </div>
-    </section>
 
-    <section id="mensajes"></section>
+        <footer id="action-phase">
+            <div id="action-cards-row">
+                <button id="boton-punio" class="action-card">
+                    <div class="card-icon-container"><div class="action-icon"></div></div>
+                    <h4>PUÑO</h4>
+                    <p class="action-description">Ataque Rápido y directo.</p>
+                </button>
+                <button id="boton-patada" class="action-card">
+                    <div class="card-icon-container"><div class="action-icon"></div></div>
+                    <h4>PATADA</h4>
+                    <p class="action-description">Ataque Contundente con la pierna.</p>
+                </button>
+                <button id="boton-barrida" class="action-card">
+                    <div class="card-icon-container"><div class="action-icon"></div></div>
+                    <h4>BARRIDA</h4>
+                    <p class="action-description">Ataque de Derribo por el suelo.</p>
+                </button>
+            </div>
+        </footer>
 
-    <section id="reiniciar">
-        <button id="boton-reiniciar">Reiniciar <i class="ph-bold ph-arrows-clockwise"></i></button>
-    </section>
+    </div>
 
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="./js/avatar.js"></script>
-  </body>
+
+    <script>
+        window.addEventListener('load', () => {
+            const botonPersonajeJugador = document.getElementById('boton-personaje');
+            if (botonPersonajeJugador) {
+                botonPersonajeJugador.addEventListener('click', () => {
+                    document.getElementById('turn-instructions').style.display = 'block';
+                    // Re-dibujar corazones al inicio
+                    actualizarCorazones('vidas-jugador', 3, 'blue');
+                    actualizarCorazones('vidas-enemigo', 3, 'red');
+                });
+            }
+        });
+
+        // Función para actualizar los corazones visualmente (se llamará desde el combate del JS principal)
+        function actualizarCorazones(idContenedor, vidas, color) {
+            const contenedor = document.getElementById(idContenedor);
+            if (!contenedor) return;
+            const hearts = contenedor.querySelectorAll('.heart');
+            
+            // Re-dibujar los corazones para reflejar las vidas actuales
+            hearts.forEach((heart, index) => {
+                if (index < vidas) {
+                    heart.style.display = 'flex';
+                    heart.textContent = vidas; // Pone el número de vidas dentro de cada corazón
+                } else {
+                    heart.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
 </html>
