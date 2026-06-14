@@ -17,10 +17,17 @@ let miPromesa = new Promise((resolver, rechazar) => {
 //    .catch(error => console.log(error));
 
 let promesa = new Promise ((resolver) => {
-    console.log('Inicio Promesa');
+    // console.log('Inicio Promesa');
     setTimeout( () => resolver('Saludos desde promesa, callback, funcion flecha y setTimeout'),3000);
-    console.log('Final Promesa');
+    // console.log('Final Promesa');
 });
 
-//El llamado a la promesa
-promesa.then(valor => console.log(valor));
+//El llamado a la promesa utilizando setTimeout
+// promesa.then(valor => console.log(valor));
+
+// async indica que una funcion regresa una promesa
+async function miFuncionConPromesa(){
+    return 'Saludos con promesas y async';
+}
+
+miFuncionConPromesa().then(valor => console.log(valor));
