@@ -1,35 +1,3 @@
-// --- LÓGICA DE INTRODUCCIÓN (NUEVO - SOLO UNA VEZ POR SESIÓN) ---
-function ejecutarIntro() {
-    // Verificamos si la intro ya fue vista en esta sesión
-    if (sessionStorage.getItem('introVista')) {
-        return; // Si ya se vio, no hacemos nada y la función termina aquí
-    }
-
-    let overlay = document.createElement('div');
-    overlay.id = "intro-container";
-    overlay.style = "position:fixed; top:0; left:0; width:100vw; height:100vh; background:black; z-index:1000; display:flex; justify-content:center; align-items:center;";
-    
-    let video = document.createElement('video');
-    video.src = "video/intro.mp4"; // Asegúrate de que esta ruta sea correcta
-    video.width = 800;
-    video.autoplay = true;
-    video.muted = true; // Obligatorio para autoplay
-    video.playsInline = true;
-    
-    video.onended = () => {
-        overlay.style.display = "none";
-        overlay.remove();
-        // Marcamos que la intro ya fue vista para que no vuelva a salir al reiniciar
-        sessionStorage.setItem('introVista', 'true');
-    };
-
-    overlay.appendChild(video);
-    document.body.appendChild(overlay);
-}
-
-// Ejecutar intro al cargar la página
-window.onload = ejecutarIntro;
-
 // --- LÓGICA DEL JUEGO ---
 let vidasJ = 3, vidasE = 3, pNameJ = "", pNameE = "";
 
