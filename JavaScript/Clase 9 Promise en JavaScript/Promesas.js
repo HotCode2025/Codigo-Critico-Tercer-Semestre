@@ -30,4 +30,14 @@ async function miFuncionConPromesa(){
     return 'Saludos con promesas y async';
 }
 
-miFuncionConPromesa().then(valor => console.log(valor));
+// miFuncionConPromesa().then(valor => console.log(valor));
+
+// async / await  (await se debe usar en una funcion donde este async sino no funciona)
+async function funcionConPromesaYAwait(){
+    let miPromesa = new Promise(resolver => {
+        resolver('Promesa con await');
+    });
+    console.log(await miPromesa);
+}
+
+funcionConPromesaYAwait(); 
