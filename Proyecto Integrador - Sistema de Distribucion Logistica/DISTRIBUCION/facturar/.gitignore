@@ -1,0 +1,146 @@
+# ============================================================
+# .gitignore para Sistema de Distribución y Logística
+# Código Crítico - Tercer Semestre 2026
+# ============================================================
+
+# ============================================================
+# BASE DE DATOS - SE SUBE PARA QUE FUNCIONE
+# ============================================================
+# ✅ La base de datos con datos se SUBE al repositorio
+# (para que los evaluadores tengan datos de prueba)
+!distribuidora.db
+!app.db
+
+# ============================================================
+# CONFIGURACIÓN DE TURSO - SE SUBE (CON TOKEN REAL)
+# ============================================================
+# ✅ Se sube el archivo con el token real
+# (para que la sincronización funcione al descargar)
+!turso-facturar.txt
+
+# ============================================================
+# ENTORNO VIRTUAL (NO SUBIR)
+# ============================================================
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+
+# Herramientas auxiliares (no afectan el funcionamiento)
+ver_notas.py
+limpiar_notas.py
+diagnostic_sync.py
+diagnostico_turso.py
+corregir_orden.py
+corregir_sync.py
+actualizar_sync_tabla.py
+agregar_preventistas.py
+generar_datos_masivos.py
+test_turso_directo.py
+reparar_indentacion.py
+
+
+# ============================================================
+# EDITORES Y CONFIGURACIÓN LOCAL (NO SUBIR)
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.orig
+*.rej
+*.patch
+*.bak
+*.tmp
+*.temp
+
+# ============================================================
+# BACKUPS Y LOGS (NO SUBIR)
+# ============================================================
+backups/
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+*.bak
+logs/
+*.log
+sync_*.log
+auditoria_*.log
+
+# ============================================================
+# REPORTES GENERADOS (NO SUBIR)
+# ============================================================
+reportes/
+reportes_salida/
+*.xlsx
+*.csv
+*.pdf
+factura_*.pdf
+nota_*.pdf
+*.html
+
+# ============================================================
+# IMÁGENES - SE SUBEN (PARA QUE FUNCIONE EL CATÁLOGO)
+# ============================================================
+# Las imágenes de productos son necesarias para el catálogo
+!imagenes_productos/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.webp
+
+# ============================================================
+# ARCHIVOS DE DATOS DE PRUEBA (NO SUBIR)
+# ============================================================
+codigos_productos.txt
+datos_prueba/
+*.db-journal
+*.db-wal
+*-shm
+
+# ============================================================
+# ARCHIVOS DE EMPAQUETADO (NO SUBIR)
+# ============================================================
+dist/
+build/
+*.egg-info/
+*.egg
+*.whl
+*.tar.gz
+
+# ============================================================
+# ARCHIVOS DEL SISTEMA OPERATIVO (NO SUBIR)
+# ============================================================
+*.lnk
+*.desktop
+nohup.out
+core
+*.core
