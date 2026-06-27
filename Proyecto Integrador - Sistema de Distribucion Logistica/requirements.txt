@@ -1,0 +1,46 @@
+# ============================================================
+# Sistema de Distribución y Logística - Código Crítico
+# Tercer Semestre 2026
+# ============================================================
+# 
+# Instalación: pip install -r requirements.txt
+# Entorno recomendado: Python 3.12+
+#
+# ============================================================
+
+# ------------------- GUI Framework -------------------
+PyQt6
+PyQt6-WebEngine
+
+# ------------------- Base de Datos y Sincronización -------------------
+# Cliente nativo de Turso (requerido)
+libsql-client==0.3.1
+# HTTP requests
+requests==2.31.0
+
+# ------------------- Reportes y Gráficos -------------------
+# Gráficos del dashboard
+matplotlib==3.8.2
+# Generación de PDF (facturas, reportes)
+reportlab==4.0.9
+# Exportación a Excel
+openpyxl==3.1.2
+
+# ------------------- Procesamiento de PDF -------------------
+# Extracción de tablas de catálogos
+pdfplumber==0.10.4
+# Procesamiento de imágenes
+Pillow==10.1.0
+
+# ------------------- Utilidades -------------------
+# Manejo avanzado de fechas (proyecciones)
+python-dateutil==2.8.2
+
+# ------------------- Empaquetado (desarrollo) -------------------
+pyinstaller==6.5.0
+
+# ============================================================
+# NOTAS:
+# - sqlite3 viene con Python, no requiere instalación
+# - Para desarrollo: black, ruff, pytest (instalar opcional)
+# ============================================================
