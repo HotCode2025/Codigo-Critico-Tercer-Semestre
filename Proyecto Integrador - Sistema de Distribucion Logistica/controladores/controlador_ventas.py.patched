@@ -1,0 +1,11 @@
+"""
+Código Crítico - Tercer Semestre - Año 2026
+Controlador de Ventas - Maneja facturación y notas de venta
+"""
+
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+import uuid
+from utilidades.sync_lock import with_sync_lock
+
+# ... (el resto del archivo)
