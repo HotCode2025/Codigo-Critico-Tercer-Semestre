@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+venv_new/
+ENV/
+dist/
+build/
+*.egg-info/
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Backups (pero NO la base principal)
+backups/
+*.zip
+*.tar.gz
+
+# Logs
+logs/
+*.log
+
+# Reportes
+reportes/
+*.xlsx
+*.csv
+
+# Imágenes subidas (las que genere el usuario)
+imagenes_productos/
+!assets/imagenes_productos/
+
+# Archivos temporales
+temp/
+tmp/
+*.tmp
+geocache.json
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ✅ NOTA: NO ignoramos distribuidora.db ni turso-facturar.txt
+# Para que el sistema funcione al descargar

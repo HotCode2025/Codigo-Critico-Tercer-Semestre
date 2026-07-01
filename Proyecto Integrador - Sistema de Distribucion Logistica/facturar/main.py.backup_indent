@@ -1,0 +1,618 @@
+"""
+Código Crítico - Tercer Semestre Año 2026
+==================================================
+main.py - Punto de entrada del sistema
+==================================================
+"""
+
+import sys
+import os
+import time
+import math
+import threading
+from datetime import datetime
+
+# ============================================================
+# CONFIGURACIÓN ANTES DE IMPORTAR PyQt6
+# ============================================================
+
+# Forzar X11 (Wayland no escala bien)
+os.environ["QT_QPA_PLATFORM"] = "xcb"
+os.environ["QT_SCALE_FACTOR"] = "1.0"
+
+# ============================================================
+# IMPORTAR PyQt6 - CONFIGURACIÓN PARA WEBENGINE
+# ============================================================
+
+from PyQt6.QtCore import Qt, QTimer, QRect, QThread, pyqtSignal
+from PyQt6.QtWidgets import QApplication, QSplashScreen, QMessageBox, QDialog
+from PyQt6.QtGui import QPixmap, QPainter, QColor, QFont, QLinearGradient, QBrush, QPen, QRegion
+
+# ✅ CONFIGURAR WEBENGINE ANTES DE CREAR LA APP
+# Esto evita el error "QtWebEngineWidgets must be imported"
+Qt.AA_ShareOpenGLContexts = Qt.ApplicationAttribute.AA_ShareOpenGLContexts
+
+# ✅ NO IMPORTAR QWebEngineView AQUÍ - se importa cuando sea necesario
+
+# Asegurar el path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from db.db_manager import inicializar_bd, obtener_conexion
+from modelos.usuario import crear_usuario_admin
+from utilidades import (
+    verificar_conexion_turso,
+    iniciar_sincronizacion_auto, 
+    sincronizar_ahora
+)
+
+# ✅ IMPORTAR VENTANA PRINCIPAL Y LOGIN
+from vistas.ventana_principal import VentanaPrincipal, DialogoLogin
+
+
+# ============================================================
+# SELECTOR CIRCULAR DE ESCALA
+# ============================================================
+
+class SelectorCircularEscala(QSplashScreen):
+    def __init__(self):
+        pixmap = QPixmap(600, 600)
+        pixmap.fill(Qt.GlobalColor.transparent)
+        super().__init__(pixmap)
+
+        self.setMask(QRegion(0, 0, 600, 600, QRegion.RegionType.Ellipse))
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint | 
+                           Qt.WindowType.FramelessWindowHint | 
+                           Qt.WindowType.SplashScreen)
+
+        self.angulo = 0
+        self.progreso = 0
+        self.escala_seleccionada = 1.0
+        self.seleccionado = False
+        self.texto = "🖥️ SELECCIONE\nRESOLUCIÓN"
+        
+        self.opciones = [
+            {"texto": "MEDIANO\n100%", "escala": 1.0, "color": "#2196F3"},
+            {"texto": "GRANDE\n130%", "escala": 1.3, "color": "#4CAF50"},
+            {"texto": "MUY GRANDE\n160%", "escala": 1.6, "color": "#FF9800"}
+        ]
+        self.opcion_seleccionada = None
+        
+        self.timer_animacion = QTimer()
+        self.timer_animacion.timeout.connect(self._actualizar_angulo)
+        self.timer_animacion.start(50)
+
+        self.timer_progreso = QTimer()
+        self.timer_progreso.timeout.connect(self._actualizar_progreso)
+
+        self.show()
+        QApplication.processEvents()
+
+    def _actualizar_angulo(self):
+        self.angulo = (self.angulo + 4) % 360
+        self.update()
+
+    def _actualizar_progreso(self):
+        if self.progreso < 100:
+            self.progreso += 2
+            self.update()
+        else:
+            self.timer_progreso.stop()
+            self.timer_animacion.stop()
+            QTimer.singleShot(300, self.close)
+
+    def iniciar_progreso(self):
+        self.progreso = 0
+        self.timer_progreso.start(30)
+
+    def mousePressEvent(self, event):
+        x = event.pos().x()
+        y = event.pos().y()
+        centro_x = self.width() // 2
+        centro_y = self.height() // 2
+        radio_interno = 100
+        radio_externo = 220
+
+        dist = ((x - centro_x) ** 2 + (y - centro_y) ** 2) ** 0.5
+        if radio_interno < dist < radio_externo:
+            ang = (math.atan2(y - centro_y, x - centro_x) * 180 / math.pi + 90) % 360
+            
+            if 0 <= ang < 120:
+                idx = 0
+            elif 120 <= ang < 240:
+                idx = 1
+            else:
+                idx = 2
+            
+            self.opcion_seleccionada = idx
+            self.escala_seleccionada = self.opciones[idx]["escala"]
+            self.seleccionado = True
+            self.texto = f"✅ {self.opciones[idx]['texto']}"
+            self.iniciar_progreso()
+
+    def drawContents(self, painter):
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        centro_x = self.width() // 2
+        centro_y = self.height() // 2
+        radio = 270
+
+        gradiente = QLinearGradient(centro_x - radio, centro_y - radio, 
+                                     centro_x + radio, centro_y + radio)
+        gradiente.setColorAt(0, QColor(26, 35, 126))
+        gradiente.setColorAt(1, QColor(13, 71, 161))
+
+        painter.setBrush(QBrush(gradiente))
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.drawEllipse(centro_x - radio, centro_y - radio, radio * 2, radio * 2)
+
+        pen = QPen()
+        pen.setWidth(4)
+        
+        pen.setColor(QColor(255, 193, 7))
+        painter.setPen(pen)
+        painter.drawArc(centro_x - 220, centro_y - 220, 440, 440,
+                       self.angulo * 16, 110 * 16)
+
+        pen.setColor(QColor(33, 150, 243))
+        painter.setPen(pen)
+        painter.drawArc(centro_x - 200, centro_y - 200, 400, 400,
+                       (360 - self.angulo) * 16, 80 * 16)
+
+        pen.setColor(QColor(76, 175, 80))
+        painter.setPen(pen)
+        painter.drawArc(centro_x - 180, centro_y - 180, 360, 360,
+                       (self.angulo + 180) * 16, 70 * 16)
+
+        painter.setPen(Qt.PenStyle.NoPen)
+        op_radio = 170
+        
+        for i, op in enumerate(self.opciones):
+            angulo = -90 + i * 120
+            rad = math.radians(angulo)
+            x = centro_x + op_radio * math.cos(rad)
+            y = centro_y + op_radio * math.sin(rad)
+            
+            if self.opcion_seleccionada == i:
+                color = QColor(255, 193, 7)
+                radio_op = 65
+                borde = QColor(255, 255, 255)
+            else:
+                color = QColor(op["color"])
+                radio_op = 60
+                borde = QColor(255, 255, 255, 100)
+            
+            painter.setBrush(QBrush(QColor(0, 0, 0, 80)))
+            painter.drawEllipse(int(x - radio_op + 4), int(y - radio_op + 4), int(radio_op * 2), int(radio_op * 2))
+            
+            painter.setBrush(QBrush(color))
+            painter.setPen(QPen(borde, 3))
+            painter.drawEllipse(int(x - radio_op), int(y - radio_op), int(radio_op * 2), int(radio_op * 2))
+            
+            painter.setPen(QPen(QColor(255, 255, 255)))
+            painter.setFont(QFont("Segoe UI", 12 if self.opcion_seleccionada != i else 13, QFont.Weight.Bold))
+            
+            lineas = op["texto"].split("\n")
+            for j, linea in enumerate(lineas):
+                rect = QRect(int(x - 55), int(y - 25 + j * 28), 110, 30)
+                painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, linea)
+            
+            if self.opcion_seleccionada == i:
+                painter.setBrush(QBrush(QColor(255, 255, 255, 200)))
+                painter.setPen(Qt.PenStyle.NoPen)
+                painter.drawEllipse(int(x + radio_op - 15), int(y - radio_op + 5), 20, 20)
+                painter.setFont(QFont("Segoe UI", 12, QFont.Weight.Bold))
+                painter.setPen(QPen(QColor(26, 35, 126)))
+                painter.drawText(QRect(int(x + radio_op - 15), int(y - radio_op + 5), 20, 20),
+                                Qt.AlignmentFlag.AlignCenter, "✓")
+
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QBrush(QColor(255, 255, 255, 230)))
+        painter.drawEllipse(centro_x - 70, centro_y - 70, 140, 140)
+
+        painter.setFont(QFont("Segoe UI", 13, QFont.Weight.Bold))
+        painter.setPen(QPen(QColor(26, 35, 126)))
+        
+        if self.seleccionado:
+            texto_mostrar = "✅\n" + self.texto.replace("✅ ", "")
+        else:
+            texto_mostrar = "🖥️\nToca\nuna\nopción"
+            painter.setFont(QFont("Segoe UI", 11, QFont.Weight.Bold))
+        
+        rect_centro = QRect(centro_x - 60, centro_y - 55, 120, 110)
+        painter.drawText(rect_centro, Qt.AlignmentFlag.AlignCenter, texto_mostrar)
+
+        if self.progreso > 0:
+            pen.setWidth(10)
+            pen.setColor(QColor(76, 175, 80))
+            painter.setPen(pen)
+            
+            angulo_fin = int(360 * self.progreso / 100)
+            painter.drawArc(centro_x - 120, centro_y - 120, 240, 240,
+                          90 * 16, angulo_fin * 16)
+            
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QBrush(QColor(76, 175, 80, 220)))
+            painter.drawEllipse(centro_x - 35, centro_y + 75, 70, 40)
+            
+            painter.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
+            painter.setPen(QPen(QColor(255, 255, 255)))
+            rect_pct = QRect(centro_x - 35, centro_y + 75, 70, 40)
+            painter.drawText(rect_pct, Qt.AlignmentFlag.AlignCenter, f"{self.progreso}%")
+        
+        painter.setFont(QFont("Segoe UI", 9))
+        painter.setPen(QPen(QColor(150, 150, 150)))
+        painter.drawText(QRect(centro_x - 200, centro_y + 180, 400, 25),
+                        Qt.AlignmentFlag.AlignCenter, "v3.0.0 - Código Crítico - UUID")
+        
+        painter.setFont(QFont("Segoe UI", 8))
+        painter.setPen(QPen(QColor(100, 100, 100, 150)))
+        painter.drawText(QRect(centro_x - 200, centro_y + 210, 400, 20),
+                        Qt.AlignmentFlag.AlignCenter, "Seleccione una resolución y toque el botón")
+
+
+# ============================================================
+# HILO DE SINCRONIZACIÓN
+# ============================================================
+
+class SyncThread(QThread):
+    progreso = pyqtSignal(str, str, int)
+    finalizado = pyqtSignal(bool, str)
+    
+    def __init__(self, db):
+        super().__init__()
+        self.db = db
+        self._is_running = True
+    
+    def stop(self):
+        self._is_running = False
+    
+    def run(self):
+        try:
+            self.progreso.emit("🔍 Verificando conexión...", "Comprobando conexión con Turso", 5)
+            self._esperar(2)
+            
+            conexion_ok = verificar_conexion_turso()
+            
+            if not conexion_ok:
+                self.progreso.emit("⚠️ Sin conexión a Turso", "Intentando reconectar...", 10)
+                self._esperar(1)
+                conexion_ok = verificar_conexion_turso()
+            
+            if not conexion_ok:
+                self.progreso.emit("⚠️ Sin conexión a Turso", "Datos locales - sincronización pendiente", 15)
+                self._esperar(1)
+                self.finalizado.emit(False, "Sin conexión a Turso")
+                return
+            
+            self.progreso.emit("✅ Conectado a Turso", "Conexión establecida", 15)
+            self._esperar(0.5)
+            
+            self.progreso.emit("📤 Enviando datos a la nube...", "Sincronizando...", 30)
+            
+            try:
+                resultado = sincronizar_ahora(self.db)
+                enviados = 0
+                central_a_turso = resultado.get('central_a_turso', {})
+                for tabla, res in central_a_turso.items():
+                    enviados += res.get('sent', 0)
+                
+                self.progreso.emit(
+                    f"✅ {enviados} registros enviados",
+                    "Datos sincronizados correctamente",
+                    95
+                )
+                self._esperar(1)
+            except Exception as e:
+                self.progreso.emit("⚠️ Error parcial", f"{str(e)[:30]}", 80)
+                self._esperar(1)
+            
+            self.progreso.emit("✅ ¡Sincronización completada!", "Todos los datos están actualizados", 100)
+            self._esperar(0.5)
+            self.finalizado.emit(True, "Sincronización exitosa")
+            
+        except Exception as e:
+            self.progreso.emit("❌ Error", f"Error en sincronización: {str(e)[:50]}", 50)
+            self._esperar(1)
+            self.finalizado.emit(False, str(e))
+    
+    def _esperar(self, segundos):
+        for _ in range(int(segundos * 10)):
+            if not self._is_running:
+                break
+            time.sleep(0.1)
+            QApplication.processEvents()
+
+
+# ============================================================
+# SPLASH DE SINCRONIZACIÓN
+# ============================================================
+
+class SplashSincronizacion(QSplashScreen):
+    def __init__(self):
+        pixmap = QPixmap(600, 600)
+        pixmap.fill(Qt.GlobalColor.transparent)
+        super().__init__(pixmap)
+        
+        self.setMask(QRegion(0, 0, 600, 600, QRegion.RegionType.Ellipse))
+        self.setWindowFlags(Qt.WindowType.WindowStaysOnTopHint | 
+                           Qt.WindowType.FramelessWindowHint | 
+                           Qt.WindowType.SplashScreen)
+        self.setStyleSheet("background: transparent;")
+        
+        self.angulo = 0
+        self.progreso = 0
+        self.texto_estado = "🔄 Conectando con Turso..."
+        self.detalle_estado = "Iniciando sincronización..."
+        self._sync_thread = None
+        
+        self.timer_animacion = QTimer()
+        self.timer_animacion.timeout.connect(self._actualizar_angulo)
+        self.timer_animacion.start(50)
+        
+        self.show()
+        QApplication.processEvents()
+    
+    def _actualizar_angulo(self):
+        self.angulo = (self.angulo + 5) % 360
+        self.update()
+    
+    def set_estado(self, texto, detalle="", progreso=None):
+        self.texto_estado = texto
+        if detalle:
+            self.detalle_estado = detalle
+        if progreso is not None:
+            self.progreso = min(progreso, 100)
+        self.update()
+        QApplication.processEvents()
+    
+    def ejecutar_sincronizacion(self, db):
+        self._sync_thread = SyncThread(db)
+        self._sync_thread.progreso.connect(self._on_progreso)
+        self._sync_thread.finalizado.connect(self._on_finalizado)
+        self._sync_thread.start()
+    
+    def _on_progreso(self, texto, detalle, progreso):
+        self.set_estado(texto, detalle, progreso)
+    
+    def _on_finalizado(self, exito, mensaje):
+        if exito:
+            self.set_estado("✅ ¡Sincronización completada!", mensaje, 100)
+        else:
+            self.set_estado("⚠️ Sincronización incompleta", mensaje, 80)
+        QTimer.singleShot(1500, self.close)
+    
+    def drawContents(self, painter):
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        centro_x = self.width() // 2
+        centro_y = self.height() // 2
+        radio = 270
+        
+        gradiente = QLinearGradient(centro_x - radio, centro_y - radio, 
+                                     centro_x + radio, centro_y + radio)
+        gradiente.setColorAt(0, QColor(26, 35, 126))
+        gradiente.setColorAt(0.5, QColor(21, 101, 192))
+        gradiente.setColorAt(1, QColor(13, 71, 161))
+        
+        painter.setBrush(QBrush(gradiente))
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.drawEllipse(centro_x - radio, centro_y - radio, radio * 2, radio * 2)
+        
+        pen = QPen()
+        pen.setWidth(5)
+        
+        pen.setColor(QColor(255, 193, 7))
+        painter.setPen(pen)
+        painter.drawArc(centro_x - 210, centro_y - 210, 420, 420,
+                       self.angulo * 16, 120 * 16)
+        
+        pen.setColor(QColor(33, 150, 243))
+        painter.setPen(pen)
+        painter.drawArc(centro_x - 190, centro_y - 190, 380, 380,
+                       (360 - self.angulo) * 16, 90 * 16)
+        
+        pen.setColor(QColor(76, 175, 80))
+        painter.setPen(pen)
+        painter.drawArc(centro_x - 170, centro_y - 170, 340, 340,
+                       (self.angulo + 180) * 16, 80 * 16)
+        
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QBrush(QColor(255, 255, 255, 230)))
+        painter.drawEllipse(centro_x - 55, centro_y - 65, 110, 110)
+        
+        painter.setBrush(QBrush(QColor(33, 150, 243, 200)))
+        painter.drawEllipse(centro_x - 30, centro_y - 40, 35, 26)
+        painter.drawEllipse(centro_x + 8, centro_y - 45, 32, 28)
+        painter.drawEllipse(centro_x - 15, centro_y - 52, 42, 30)
+        painter.drawRoundedRect(centro_x - 38, centro_y - 30, 78, 26, 8, 8)
+        
+        pen.setWidth(4)
+        pen.setColor(QColor(255, 193, 7))
+        painter.setPen(pen)
+        
+        ang_flecha = math.radians(self.angulo)
+        fx = centro_x + 30 * math.cos(ang_flecha)
+        fy = centro_y - 15 + 30 * math.sin(ang_flecha)
+        
+        painter.drawLine(centro_x, centro_y - 15, int(fx), int(fy))
+        painter.drawLine(int(fx), int(fy), int(fx - 8 * math.cos(ang_flecha - 0.5)), 
+                        int(fy - 8 * math.sin(ang_flecha - 0.5)))
+        painter.drawLine(int(fx), int(fy), int(fx - 8 * math.cos(ang_flecha + 0.5)), 
+                        int(fy - 8 * math.sin(ang_flecha + 0.5)))
+        
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QBrush(QColor(255, 255, 255, 200)))
+        painter.drawRoundedRect(centro_x - 200, centro_y + 55, 400, 35, 10, 10)
+        
+        painter.setFont(QFont("Segoe UI", 15, QFont.Weight.Bold))
+        painter.setPen(QPen(QColor(26, 35, 126)))
+        painter.drawText(QRect(centro_x - 200, centro_y + 55, 400, 35),
+                        Qt.AlignmentFlag.AlignCenter, self.texto_estado)
+        
+        painter.setFont(QFont("Segoe UI", 11))
+        painter.setPen(QPen(QColor(200, 200, 200)))
+        painter.drawText(QRect(centro_x - 220, centro_y + 100, 440, 30),
+                        Qt.AlignmentFlag.AlignCenter, self.detalle_estado)
+        
+        if self.progreso > 0:
+            pen.setWidth(12)
+            pen.setColor(QColor(76, 175, 80))
+            painter.setPen(pen)
+            
+            angulo_fin = int(360 * self.progreso / 100)
+            painter.drawArc(centro_x - 130, centro_y - 130, 260, 260,
+                          90 * 16, angulo_fin * 16)
+            
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QBrush(QColor(76, 175, 80, 220)))
+            painter.drawEllipse(centro_x - 40, centro_y + 145, 80, 45)
+            
+            painter.setFont(QFont("Segoe UI", 16, QFont.Weight.Bold))
+            painter.setPen(QPen(QColor(255, 255, 255)))
+            rect_pct = QRect(centro_x - 40, centro_y + 145, 80, 45)
+            painter.drawText(rect_pct, Qt.AlignmentFlag.AlignCenter, f"{self.progreso}%")
+        
+        painter.setFont(QFont("Segoe UI", 9))
+        painter.setPen(QPen(QColor(150, 150, 150)))
+        painter.drawText(QRect(centro_x - 220, centro_y + 210, 440, 25),
+                        Qt.AlignmentFlag.AlignCenter, "v3.0.0 - Código Crítico - UUID")
+        painter.setFont(QFont("Segoe UI", 8))
+        painter.setPen(QPen(QColor(100, 100, 100, 150)))
+        painter.drawText(QRect(centro_x - 220, centro_y + 235, 440, 20),
+                        Qt.AlignmentFlag.AlignCenter, "Sincronizando con la nube...")
+    
+    def closeEvent(self, event):
+        if self._sync_thread and self._sync_thread.isRunning():
+            self._sync_thread.stop()
+            self._sync_thread.wait(2000)
+        self.timer_animacion.stop()
+        super().closeEvent(event)
+
+
+# ============================================================
+# FUNCIÓN PRINCIPAL
+# ============================================================
+
+def main():
+    print("=" * 60)
+    print("   SISTEMA DE DISTRIBUCIÓN Y LOGÍSTICA - UUID")
+    print("   Código Crítico - Tercer Semestre 2026")
+    print("=" * 60)
+
+    # ============================================================
+    # 1. INICIALIZAR BASE DE DATOS
+    # ============================================================
+    print("\n📁 Inicializando base de datos...")
+    inicializar_bd()
+    print("✅ Base de datos lista.")
+
+    db = obtener_conexion()
+    crear_usuario_admin(db)
+    db.close()
+
+    # ============================================================
+    # 2. CREAR APP TEMPORAL PARA EL SELECTOR
+    # ============================================================
+    app_temp = QApplication(sys.argv)
+    app_temp.setStyle("Fusion")
+    
+    selector = SelectorCircularEscala()
+    
+    while not selector.seleccionado:
+        app_temp.processEvents()
+        if selector.isHidden():
+            break
+    
+    while selector.progreso < 100 and not selector.isHidden():
+        app_temp.processEvents()
+    
+    factor_escala = selector.escala_seleccionada
+    print(f"📐 Factor de escala seleccionado: {factor_escala}")
+    
+    selector.close()
+    app_temp.quit()
+    app_temp = None
+    
+    os.environ["QT_SCALE_FACTOR"] = str(factor_escala)
+    os.environ["QT_FONT_DPI"] = str(int(96 * factor_escala))
+    print(f"✅ Escala global aplicada: {factor_escala * 100}%")
+
+    # ============================================================
+    # 3. CREAR APP PRINCIPAL
+    # ============================================================
+    app = QApplication(sys.argv)
+    app.setStyle("Fusion")
+    app.setApplicationName("Sistema Distribución y Logística")
+    app.setOrganizationName("CodigoCritico")
+    app.setHighDpiScaleFactorRoundingPolicy(
+        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+    )
+
+    # ============================================================
+    # 4. SPLASH DE SINCRONIZACIÓN
+    # ============================================================
+    splash_sync = SplashSincronizacion()
+    app.processEvents()
+    print("✅ Splash de sincronización mostrado (600x600)")
+
+    # ============================================================
+    # 5. EJECUTAR SINCRONIZACIÓN EN HILO SEPARADO
+    # ============================================================
+    db_conn = obtener_conexion()
+    
+    if verificar_conexion_turso():
+        splash_sync.ejecutar_sincronizacion(db_conn)
+    else:
+        splash_sync.set_estado("⚠️ Sin conexión a Turso", "Datos locales - sincronización pendiente", 50)
+        QTimer.singleShot(2000, splash_sync.close)
+    
+    tiempo_espera = 0
+    while splash_sync.isVisible() and tiempo_espera < 300:
+        app.processEvents()
+        time.sleep(0.5)
+        tiempo_espera += 0.5
+    
+    if splash_sync.isVisible():
+        splash_sync.close()
+        print("⚠️ Timeout: Forzando cierre del splash")
+    
+    print("✅ Splash de sincronización cerrado")
+
+    # ============================================================
+    # 6. INICIAR SINCRONIZACIÓN AUTOMÁTICA
+    # ============================================================
+    try:
+        iniciar_sincronizacion_auto(db_conn, intervalo=5)
+        print("🔄 Sincronización automática iniciada (en segundo plano)")
+    except Exception as e:
+        print(f"⚠️ Error iniciando sincronización automática: {e}")
+    
+    db_conn.close()
+
+    # ============================================================
+    # 7. LOGIN Y VENTANA PRINCIPAL
+    # ============================================================
+    db = obtener_conexion()
+    login = DialogoLogin(db)
+
+    if login.exec() == QDialog.DialogCode.Accepted:
+        ventana = VentanaPrincipal(usuario=login.usuario_actual)
+    # Iniciar sincronizador simple
+    iniciar_sincronizador()
+        ventana.show()
+        ventana.raise_()
+        ventana.activateWindow()
+        ventana.setWindowState(ventana.windowState() & ~Qt.WindowState.WindowMinimized)
+        ventana.repaint()
+        QApplication.processEvents()
+        print("✅ Ventana principal mostrada")
+        print(f"📐 Escala aplicada: {factor_escala * 100}%")
+    else:
+        print("❌ Login cancelado. Saliendo...")
+        app.quit()
+
+    sys.exit(app.exec())
+
+
+if __name__ == "__main__":
+    main()
